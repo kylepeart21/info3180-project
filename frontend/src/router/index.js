@@ -6,7 +6,9 @@ import LogoutView from '../views/LogoutView.vue'
 import NewProfileView from '../views/NewProfileView.vue'
 import ProfileDetailsView from '../views/ProfileDetailsView.vue'
 import FavouritesView from '../views/FavouritesView.vue'
-import UserProfileView from "../views/UserProfileView.vue";
+import UserProfileView from "../views/UserProfileView.vue"
+import MessagesView from '../views/MessagesView.vue'
+import EditProfileView from '../views/EditProfileView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,9 +49,19 @@ const router = createRouter({
       component: FavouritesView
     },
     {
+      path: '/profiles/edit',
+      name: 'Edit Profile',
+      component: EditProfileView
+    },
+    {
       path: '/profiles/:profile_id',
       name: 'Profile Details',
       component: ProfileDetailsView
+    },
+    {
+      path: '/messages',
+      name: 'Messages',
+      component: MessagesView
     }
   ]
 })

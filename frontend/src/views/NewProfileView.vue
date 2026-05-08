@@ -29,8 +29,23 @@ const formData = reactive({
   fav_school_subject: '',
   political: false,
   religious: false,
-  family_oriented: false
+  family_oriented: false,
+  interests: []
 })
+
+const interestInput = ref('')
+
+function addInterest() {
+  const val = interestInput.value.trim()
+  if (val && !formData.interests.includes(val)) {
+    formData.interests.push(val)
+  }
+  interestInput.value = ''
+}
+
+function removeInterest(interest) {
+  formData.interests = formData.interests.filter(i => i !== interest)
+}
 
 const validateForm = () => {
   const requiredFields = [
@@ -192,6 +207,27 @@ const handleSubmit = async () => {
           </div>
         </div>
 
+        <!-- Interests -->
+        <div class="form-group">
+          <label class="label">Interests / Hobbies (min 3)</label>
+          <div class="interests-row">
+            <input
+              type="text"
+              v-model="interestInput"
+              @keydown.enter.prevent="addInterest"
+              class="input"
+              placeholder="Type an interest and press Enter or click Add"
+            />
+            <button type="button" @click="addInterest" class="btn-add">Add</button>
+          </div>
+          <div class="interests-tags" v-if="formData.interests.length">
+            <span v-for="interest in formData.interests" :key="interest" class="tag">
+              {{ interest }}
+              <button type="button" @click="removeInterest(interest)" class="tag-remove">&times;</button>
+            </span>
+          </div>
+        </div>
+
         <!-- Checkboxes -->
         <div class="space-y-4">
           <div class="flex items-center">
@@ -210,7 +246,7 @@ const handleSubmit = async () => {
           </div>
         </div>
 
-        <div class="flex justify-end space-x-4">
+        <div class="flex justify-end space-x-4" style="margin-top: 1rem">
           <button
             type="button"
             @click="router.back()"
@@ -334,6 +370,51 @@ textarea {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.interests-row {
+  display: flex;
+  gap: 8px;
+}
+
+.interests-row .input { flex: 1; }
+
+.btn-add {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.interests-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tag {
+  background: #e9ecef;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #888;
+  line-height: 1;
+  padding: 0;
 }
 
 .success,

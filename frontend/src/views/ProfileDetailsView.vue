@@ -17,13 +17,18 @@ export default {
       loading: true,
       error: null,
       isFavorited: false,
+      isMutualMatch: false,
+      isPassed: false,
       showMatches: false,
       matches: [],
       loadingMatches: false
     }
   },
   created() {
-    this.fetchProfileDetails().then(() => this.checkIfFavorited())
+    this.fetchProfileDetails().then(() => {
+      this.checkIfFavorited()
+      this.checkMutualMatch()
+    })
   },
   methods: {
     async fetchProfileDetails() {
@@ -59,6 +64,32 @@ export default {
       }
     },
     
+    async checkMutualMatch() {
+      try {
+        const token = localStorage.getItem('jwt')
+        const res = await apiClient.get('/api/profiles/mutual-matches', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const mutualIds = res.data.profiles.map(p => p.user_id_fk)
+        this.isMutualMatch = mutualIds.includes(this.profile.user_id_fk)
+      } catch (e) {
+        console.error('Error checking mutual match:', e)
+      }
+    },
+
+    async passProfile() {
+      try {
+        const token = localStorage.getItem('jwt')
+        await apiClient.post(`/api/profiles/${this.profile.user_id_fk}/pass`, {}, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        this.isPassed = true
+        this.$toast?.success('Profile passed')
+      } catch (e) {
+        console.error('Error passing profile:', e)
+      }
+    },
+
     async toggleFavorite() {
       try {
         const token = localStorage.getItem('jwt');
@@ -135,27 +166,33 @@ export default {
     
     <div v-else class="profile-container">
       <div class="profile-header">
-        <h1>{{ profile.name }}'s Profile</h1>
+        <div class="header-left">
+          <h1>{{ profile.name }}'s Profile</h1>
+          <div v-if="isMutualMatch" class="mutual-badge">Mutual Match 💚</div>
+        </div>
         <div class="actions">
-          <heart-button 
+          <heart-button
             :value="isFavorited"
             :profile-id="profile.id"
             @toggle="toggleFavorite"
           />
+          <button class="action-btn pass-btn" @click="passProfile" :disabled="isPassed">
+            {{ isPassed ? 'Passed' : 'Pass' }}
+          </button>
+          <router-link to="/messages" class="action-btn msg-btn">
+            <span class="btn-icon">💬</span>
+            Message
+          </router-link>
           <button class="action-btn match-btn" @click="matchMe">
             <span class="btn-icon">🔄</span>
             Match Me
-          </button>
-          <button class="action-btn email-btn" @click="sendEmail">
-            <span class="btn-icon">✉️</span>
-            Email Profile
           </button>
         </div>
       </div>
 
       <div class="profile-body">
         <div class="profile-image">
-          <img :src="profile.image_url || '/default-profile.jpg'" :alt="profile.name">
+          <img :src="profile.photo || '/default-profile.jpg'" :alt="profile.name">
         </div>
         
         <div class="profile-info">
@@ -336,12 +373,26 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
+
+.header-left { display: flex; flex-direction: column; gap: 6px; }
 
 .profile-header h1 {
   margin: 0;
   font-size: 24px;
   color: #333;
+}
+
+.mutual-badge {
+  background: #28a745;
+  color: white;
+  border-radius: 16px;
+  padding: 3px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
 }
 
 .actions {
@@ -365,20 +416,26 @@ export default {
 .match-btn {
   background-color: #3498db;
   color: white;
+  text-decoration: none;
 }
 
-.match-btn:hover {
-  background-color: #2980b9;
+.match-btn:hover { background-color: #2980b9; }
+
+.pass-btn {
+  background-color: #e9ecef;
+  color: #555;
 }
 
-.email-btn {
+.pass-btn:hover:not(:disabled) { background-color: #f8d7da; color: #dc3545; }
+.pass-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.msg-btn {
   background-color: #2ecc71;
   color: white;
+  text-decoration: none;
 }
 
-.email-btn:hover {
-  background-color: #27ae60;
-}
+.msg-btn:hover { background-color: #27ae60; }
 
 .btn-icon {
   font-size: 16px;

@@ -110,11 +110,18 @@ def profiles():
             BlockedUser.blocked_id == user_id
         )
 
+        passed_users = db.session.query(
+            Pass.passed_user_id_fk
+        ).filter(
+            Pass.user_id_fk == user_id
+        )
+
         profiles = Profile.query.filter(
             Profile.is_public == True,
             Profile.user_id_fk != user_id,
             ~Profile.user_id_fk.in_(blocked_users),
-            ~Profile.user_id_fk.in_(blocked_by_users)
+            ~Profile.user_id_fk.in_(blocked_by_users),
+            ~Profile.user_id_fk.in_(passed_users)
         ).all()
 
         profile_list = [
@@ -213,7 +220,29 @@ def profiles():
             profile=new_profile.to_dict()
         ), 201
 
-@app.route('/api/profiles/<profile_id>', methods=['GET'])
+@app.route('/api/profiles/mutual-matches', methods=['GET'])
+@jwt_required()
+def get_mutual_matches():
+    current_user_id = int(get_jwt_identity())
+
+    my_favs = db.session.query(Favourite.fav_user_id_fk).filter(
+        Favourite.user_id_fk == current_user_id
+    )
+
+    mutual_user_ids = db.session.query(Favourite.user_id_fk).filter(
+        Favourite.user_id_fk.in_(my_favs),
+        Favourite.fav_user_id_fk == current_user_id
+    )
+
+    mutual_profiles = Profile.query.filter(
+        Profile.user_id_fk.in_(mutual_user_ids),
+        Profile.is_public == True
+    ).all()
+
+    return jsonify(profiles=[p.to_dict() for p in mutual_profiles]), 200
+
+
+@app.route('/api/profiles/<int:profile_id>', methods=['GET'])
 @jwt_required()
 def get_profile(profile_id):
     profile = Profile.query.filter_by(id=profile_id).first()
@@ -223,11 +252,44 @@ def get_profile(profile_id):
 
     return jsonify(profile=profile.to_dict()), 200
 
-@app.route('/api/profiles/<user_id>/favourite', methods=['POST'])
+
+@app.route('/api/profiles/<int:profile_id>', methods=['PUT'])
+@jwt_required()
+def update_profile(profile_id):
+    current_user_id = int(get_jwt_identity())
+    profile = Profile.query.filter_by(id=profile_id, user_id_fk=current_user_id).first()
+
+    if not profile:
+        return jsonify({"error": "Profile not found or unauthorized"}), 404
+
+    data = request.get_json()
+
+    for field in ['description', 'parish', 'biography', 'sex', 'race', 'birth_year',
+                  'height', 'fav_cuisine', 'fav_colour', 'fav_school_subject',
+                  'political', 'religious', 'family_oriented', 'is_public']:
+        if field in data:
+            setattr(profile, field, data[field])
+
+    if 'interests' in data:
+        profile.interests.clear()
+        for interest_name in data['interests']:
+            if not interest_name.strip():
+                continue
+            interest = Interest.query.filter_by(name=interest_name.strip()).first()
+            if not interest:
+                interest = Interest(name=interest_name.strip())
+                db.session.add(interest)
+            profile.interests.append(interest)
+
+    db.session.commit()
+    return jsonify(message="Profile updated successfully", profile=profile.to_dict()), 200
+
+
+@app.route('/api/profiles/<int:user_id>/favourite', methods=['POST'])
 @jwt_required()
 def favourite(user_id):
     current_user_id = int(get_jwt_identity())
-    fav_user_id = int(user_id)
+    fav_user_id = user_id
 
     if current_user_id == fav_user_id:
         return jsonify({"error": "Cannot Favourite Yourself"}), 400
@@ -255,7 +317,47 @@ def favourite(user_id):
     return jsonify({"message": "User added to Favorites"}), 201
 
 
-@app.route('/api/profiles/matches/<profile_id>', methods=['GET'])
+@app.route('/api/profiles/<int:user_id>/favourite', methods=['DELETE'])
+@jwt_required()
+def remove_favourite(user_id):
+    current_user_id = int(get_jwt_identity())
+
+    existing_fav = Favourite.query.filter_by(
+        user_id_fk=current_user_id,
+        fav_user_id_fk=user_id
+    ).first()
+
+    if not existing_fav:
+        return jsonify({"error": "Not in favourites"}), 404
+
+    db.session.delete(existing_fav)
+    db.session.commit()
+
+    return jsonify({"message": "Removed from favourites"}), 200
+
+
+@app.route('/api/profiles/<int:user_id>/pass', methods=['POST'])
+@jwt_required()
+def pass_profile(user_id):
+    current_user_id = int(get_jwt_identity())
+
+    if current_user_id == user_id:
+        return jsonify({"error": "Cannot pass yourself"}), 400
+
+    existing = Pass.query.filter_by(
+        user_id_fk=current_user_id,
+        passed_user_id_fk=user_id
+    ).first()
+
+    if existing:
+        return jsonify({"message": "Already passed"}), 200
+
+    db.session.add(Pass(user_id_fk=current_user_id, passed_user_id_fk=user_id))
+    db.session.commit()
+    return jsonify({"message": "Profile passed"}), 201
+
+
+@app.route('/api/profiles/matches/<int:profile_id>', methods=['GET'])
 @jwt_required()
 def get_profile_matches(profile_id):
 
@@ -346,14 +448,12 @@ def search():
     current_user = get_jwt_identity()
     user_id = int(current_user)
 
-    name         = request.args.get('name')
-    birth_year   = request.args.get('birth_year', type=int)
-    sex          = request.args.get('sex')
-    race         = request.args.get('race')
-
-    # New parameters:
-    # gender      — alias for sex (ignored if sex is also provided)
-    # date_of_birth — accepts "YYYY" or "YYYY-MM-DD" (ignored if birth_year is also provided)
+    name          = request.args.get('name')
+    birth_year    = request.args.get('birth_year', type=int)
+    sex           = request.args.get('sex')
+    race          = request.args.get('race')
+    parish        = request.args.get('parish')
+    interests     = request.args.get('interests')
     gender        = request.args.get('gender')
     date_of_birth = request.args.get('date_of_birth')
 
@@ -390,6 +490,16 @@ def search():
         except (ValueError, AttributeError):
             return jsonify({"error": "Invalid date_of_birth format. Use YYYY or YYYY-MM-DD"}), 400
 
+    if parish:
+        query = query.filter(func.lower(Profile.parish).like(f'%{parish.lower()}%'))
+
+    if interests:
+        interest_list = [i.strip().lower() for i in interests.split(',') if i.strip()]
+        if interest_list:
+            query = query.join(Profile.interests).filter(
+                func.lower(Interest.name).in_(interest_list)
+            ).distinct()
+
     # OPTIONAL FEATURE — Hide blocked users
     blocked_users = db.session.query(BlockedUser.blocked_id).filter(
         BlockedUser.blocker_id == user_id
@@ -411,7 +521,7 @@ def search():
     return jsonify(profiles=profiles), 200
 
 
-@app.route('/api/users/<user_id>', methods=['GET'])
+@app.route('/api/users/<int:user_id>', methods=['GET'])
 @jwt_required()
 def get_user(user_id):
     user = User.query.filter_by(id=user_id).first()
@@ -420,6 +530,17 @@ def get_user(user_id):
         return jsonify(error="User not found"), 404
 
     return jsonify(user=user.to_dict()), 200
+
+
+@app.route('/api/users/<int:user_id>/profile', methods=['GET'])
+@jwt_required()
+def get_user_profile(user_id):
+    profile = Profile.query.filter_by(user_id_fk=user_id).first()
+
+    if not profile:
+        return jsonify({"error": "Profile not found"}), 404
+
+    return jsonify(profile=profile.to_dict()), 200
 
 @app.route('/api/users/<user_id>/favourites', methods=['GET'])
 @jwt_required()
@@ -538,6 +659,47 @@ def get_top_favourites(N):
         result.append(user_data)
 
     return jsonify(result), 200
+@app.route('/api/messages/conversations', methods=['GET'])
+@jwt_required()
+def get_conversations():
+    current_user_id = int(get_jwt_identity())
+
+    sent_to = db.session.query(Message.receiver_id).filter(
+        Message.sender_id == current_user_id
+    ).distinct()
+
+    received_from = db.session.query(Message.sender_id).filter(
+        Message.receiver_id == current_user_id
+    ).distinct()
+
+    partner_ids = set(
+        [r[0] for r in sent_to.all()] + [r[0] for r in received_from.all()]
+    )
+
+    conversations = []
+    for partner_id in partner_ids:
+        partner = User.query.get(partner_id)
+        if not partner:
+            continue
+
+        last_message = Message.query.filter(
+            ((Message.sender_id == current_user_id) & (Message.receiver_id == partner_id)) |
+            ((Message.sender_id == partner_id) & (Message.receiver_id == current_user_id))
+        ).order_by(Message.timestamp.desc()).first()
+
+        conversations.append({
+            'user': partner.to_dict(),
+            'last_message': last_message.to_dict() if last_message else None
+        })
+
+    conversations.sort(
+        key=lambda x: x['last_message']['timestamp'] if x['last_message'] else '',
+        reverse=True
+    )
+
+    return jsonify(conversations=conversations), 200
+
+
 @app.route('/api/messages', methods=['POST'])
 @jwt_required()
 def send_message():

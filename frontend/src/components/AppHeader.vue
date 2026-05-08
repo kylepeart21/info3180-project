@@ -32,13 +32,19 @@
             <!-- Authenticated Navigation -->
             <template v-else>
               <li class="nav-item">
-                <RouterLink class="nav-link" :to="`/users/${authStore.user_id}`">My Profile</RouterLink>
+                <RouterLink class="nav-link" :to="`/users/${authStore.user_id}`">Browse</RouterLink>
               </li>
               <li class="nav-item">
-                <RouterLink class="nav-link" to="/profiles/new">Add New Profile</RouterLink>
+                <RouterLink class="nav-link" to="/profiles/new">Add Profile</RouterLink>
               </li>
               <li class="nav-item">
-                <RouterLink class="nav-link" to="/profiles/favourites">View Reports</RouterLink>
+                <RouterLink class="nav-link" to="/profiles/edit">Edit Profile</RouterLink>
+              </li>
+              <li class="nav-item">
+                <RouterLink class="nav-link" to="/profiles/favourites">Favourites</RouterLink>
+              </li>
+              <li class="nav-item">
+                <RouterLink class="nav-link" to="/messages">Messages</RouterLink>
               </li>
               <li class="nav-item">
                 <RouterLink class="nav-link" to="/logout">Logout</RouterLink>

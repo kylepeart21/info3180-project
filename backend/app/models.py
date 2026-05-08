@@ -176,7 +176,9 @@ class Profile(db.Model):
 
             "interests": [
                 interest.name for interest in self.interests
-            ]
+            ],
+            "name": self.user.name if self.user else None,
+            "photo": url_for('get_uploaded_file', filename=self.user.photo, _external=True) if self.user and self.user.photo else None,
         }
 
 class Favourite(db.Model):
@@ -265,4 +267,20 @@ class Message(db.Model):
             "content": self.content,
             "timestamp": self.timestamp.isoformat()
         }
-    
+
+
+class Pass(db.Model):
+    __tablename__ = 'passes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id_fk = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    passed_user_id_fk = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __init__(self, user_id_fk, passed_user_id_fk):
+        self.user_id_fk = user_id_fk
+        self.passed_user_id_fk = passed_user_id_fk
+
+    def __repr__(self):
+        return f'<Pass {self.user_id_fk} passed {self.passed_user_id_fk}>'
+
