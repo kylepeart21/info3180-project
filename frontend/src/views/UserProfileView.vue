@@ -29,7 +29,7 @@
                 <p class="parish">{{ profile.parish }}</p>
                 <div class="card-btns">
                   <router-link :to="`/profiles/${profile.id}`" class="btn btn-light btn-sm">View</router-link>
-                  <router-link :to="`/messages`" class="btn btn-success btn-sm">Message</router-link>
+                  <router-link :to="`/messages?userId=${profile.user_id_fk}`" class="btn btn-success btn-sm">Message</router-link>
                 </div>
               </div>
             </div>

@@ -116,15 +116,19 @@ onMounted(async () => {
   // If navigated from a profile page with ?userId=X, open that chat
   const targetUserId = route.query.userId ? parseInt(route.query.userId) : null
   if (targetUserId) {
-    // Try to find user in existing conversations
-    let target = conversations.value.find(c => c.user.id === targetUserId)
-    if (target) {
-      await selectConversation(target.user)
+    // Try to find user in existing conversations first
+    const existing = conversations.value.find(c => c.user.id === targetUserId)
+    if (existing) {
+      await selectConversation(existing.user)
     } else {
-      // User not in conversations yet — fetch their info and open chat
+      // No prior conversation — fetch the user and open a fresh chat panel
       try {
         const res = await apiClient.get(`/api/users/${targetUserId}`, { headers: headers() })
-        await selectConversation(res.data.user)
+        const user = res.data.user
+        // Manually set selectedUser so the chat panel opens immediately
+        selectedUser.value = user
+        messages.value = []
+        loadingMessages.value = false
       } catch (e) {
         console.error('Could not load user for chat:', e)
       }
