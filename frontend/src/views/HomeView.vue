@@ -6,16 +6,19 @@ import { RouterLink } from 'vue-router'
 
   <section class="hero-page">
 
-    <!-- BACKGROUND GLOW -->
+    <!-- DARK OVERLAY -->
+    <div class="hero-overlay"></div>
+
+    <!-- BACKGROUND GLOWS -->
     <div class="hero-glow hero-glow-1"></div>
     <div class="hero-glow hero-glow-2"></div>
 
-    <!-- HERO CONTENT -->
+    <!-- CONTENT -->
     <div class="hero-container">
 
       <div class="hero-content glass-card">
 
-        <!-- TOP BADGE -->
+        <!-- BADGE -->
         <div class="hero-badge">
           ✨ Jamaica's Modern Dating Experience
         </div>
@@ -23,10 +26,16 @@ import { RouterLink } from 'vue-router'
         <!-- TITLE -->
         <h1 class="hero-title">
 
-          Meet Real People.
+          Meet Real
           <br>
 
-          Build Real Connections.
+          People.
+          <br>
+
+          Build Real
+          <br>
+
+          Connections.
 
         </h1>
 
@@ -40,7 +49,7 @@ import { RouterLink } from 'vue-router'
 
         </p>
 
-        <!-- CTA BUTTONS -->
+        <!-- BUTTONS -->
         <div class="hero-actions">
 
           <RouterLink
@@ -111,7 +120,27 @@ import { RouterLink } from 'vue-router'
 }
 
 /* =========================
-   BACKGROUND GLOWS
+   DARK OVERLAY
+========================= */
+
+.hero-overlay {
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,0.45),
+      rgba(0,0,0,0.35)
+    );
+
+  z-index: 1;
+}
+
+/* =========================
+   GLOWS
 ========================= */
 
 .hero-glow {
@@ -122,9 +151,11 @@ import { RouterLink } from 'vue-router'
 
   filter: blur(120px);
 
-  opacity: 0.25;
+  opacity: 0.22;
 
   pointer-events: none;
+
+  z-index: 0;
 }
 
 .hero-glow-1 {
@@ -134,26 +165,30 @@ import { RouterLink } from 'vue-router'
 
   background: #8b5cf6;
 
-  top: -100px;
+  top: -120px;
   left: -120px;
 }
 
 .hero-glow-2 {
 
-  width: 360px;
-  height: 360px;
+  width: 380px;
+  height: 380px;
 
   background: #ec4899;
 
-  bottom: -120px;
-  right: -80px;
+  bottom: -140px;
+  right: -100px;
 }
 
 /* =========================
-   HERO CONTAINER
+   CONTAINER
 ========================= */
 
 .hero-container {
+
+  position: relative;
+
+  z-index: 2;
 
   width: 100%;
 
@@ -164,8 +199,6 @@ import { RouterLink } from 'vue-router'
   justify-content: center;
 
   align-items: center;
-
-  z-index: 2;
 }
 
 /* =========================
@@ -176,17 +209,32 @@ import { RouterLink } from 'vue-router'
 
   width: 100%;
 
-  max-width: 720px;
+  max-width: 760px;
 
-  padding: 60px;
+  padding: 70px 60px;
 
   text-align: center;
 
   border-radius: 36px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(12,18,32,0.78),
+      rgba(18,24,42,0.62)
+    );
+
+  border:
+    1px solid rgba(255,255,255,0.10);
+
+  backdrop-filter: blur(26px);
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.55);
 }
 
 /* =========================
-   HERO BADGE
+   BADGE
 ========================= */
 
 .hero-badge {
@@ -209,13 +257,14 @@ import { RouterLink } from 'vue-router'
   border:
     1px solid rgba(255,255,255,0.08);
 
-  backdrop-filter: blur(12px);
-
-  color: rgba(255,255,255,0.92);
+  color:
+    rgba(255,255,255,0.92);
 
   font-size: 0.9rem;
 
   font-weight: 600;
+
+  backdrop-filter: blur(12px);
 }
 
 /* =========================
@@ -224,17 +273,21 @@ import { RouterLink } from 'vue-router'
 
 .hero-title {
 
-  font-size: clamp(3rem, 8vw, 5.8rem);
+  font-size:
+    clamp(3.5rem, 8vw, 6rem);
 
   font-weight: 800;
 
-  line-height: 1;
+  line-height: 0.95;
 
   letter-spacing: -0.05em;
 
-  margin-bottom: 24px;
-
   color: white;
+
+  margin-bottom: 30px;
+
+  text-shadow:
+    0 10px 30px rgba(0,0,0,0.45);
 }
 
 /* =========================
@@ -245,14 +298,14 @@ import { RouterLink } from 'vue-router'
 
   max-width: 620px;
 
-  margin: 0 auto 42px;
+  margin: 0 auto 44px;
 
   font-size: 1.15rem;
 
   line-height: 1.8;
 
   color:
-    rgba(255,255,255,0.72);
+    rgba(255,255,255,0.82);
 }
 
 /* =========================
@@ -267,37 +320,37 @@ import { RouterLink } from 'vue-router'
 
   gap: 18px;
 
-  margin-bottom: 52px;
-
   flex-wrap: wrap;
+
+  margin-bottom: 56px;
 }
 
 .hero-btn {
 
-  min-width: 180px;
+  min-width: 190px;
 
   padding: 16px 24px;
+
+  border-radius: 20px;
 
   font-size: 1rem;
 
   font-weight: 700;
 
-  border-radius: 20px;
-
   text-align: center;
 }
 
-/* SECONDARY BUTTON */
+/* SECONDARY */
 
 .secondary-btn {
 
   background:
-    rgba(255,255,255,0.08);
+    rgba(255,255,255,0.14);
 
   color: white;
 
   border:
-    1px solid rgba(255,255,255,0.1);
+    1px solid rgba(255,255,255,0.10);
 
   backdrop-filter: blur(12px);
 
@@ -307,7 +360,7 @@ import { RouterLink } from 'vue-router'
 .secondary-btn:hover {
 
   background:
-    rgba(255,255,255,0.14);
+    rgba(255,255,255,0.18);
 
   transform:
     translateY(-3px);
@@ -323,7 +376,7 @@ import { RouterLink } from 'vue-router'
 
   justify-content: center;
 
-  gap: 60px;
+  gap: 70px;
 
   flex-wrap: wrap;
 }
@@ -335,7 +388,7 @@ import { RouterLink } from 'vue-router'
 
 .stat-item h3 {
 
-  font-size: 2rem;
+  font-size: 2.2rem;
 
   font-weight: 800;
 
@@ -360,22 +413,17 @@ import { RouterLink } from 'vue-router'
 
   .hero-content {
 
-    padding: 40px 28px;
+    padding: 48px 28px;
   }
 
   .hero-title {
 
-    font-size: 3.2rem;
+    font-size: 3.3rem;
   }
 
   .hero-description {
 
     font-size: 1rem;
-  }
-
-  .hero-stats {
-
-    gap: 28px;
   }
 
   .hero-actions {
@@ -386,6 +434,11 @@ import { RouterLink } from 'vue-router'
   .hero-btn {
 
     width: 100%;
+  }
+
+  .hero-stats {
+
+    gap: 28px;
   }
 }
 
