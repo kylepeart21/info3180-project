@@ -9,6 +9,8 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, get_jwt
 )
 from werkzeug.security import check_password_hash
+import cloudinary.uploader
+
 
 revoked_tokens = set()
 
@@ -18,6 +20,7 @@ def get_uploaded_file(filename):
 
 @app.route('/api/register', methods=['POST'])
 def register():
+
     if not request.content_type.startswith('multipart/form-data'):
         return jsonify(error="Unsupported content type"), 415
 
@@ -25,44 +28,62 @@ def register():
     password = request.form.get('password')
     name = request.form.get('name')
     email = request.form.get('email')
+
     photo = request.files.get('photo')
 
     if not all([username, password, name, email]):
         return jsonify(error="Missing required fields"), 400
 
+    # Check duplicates
     if User.query.filter_by(username=username).first():
         return jsonify(error="Username already exists"), 409
+
     if User.query.filter_by(email=email).first():
         return jsonify(error="Email already exists"), 409
 
-    photo_filename = None
+    # CLOUDINARY IMAGE UPLOAD
+    photo_url = None
 
     if photo:
+
+        allowed_extensions = {
+            'png',
+            'jpg',
+            'jpeg',
+            'gif'
+        }
+
         filename = secure_filename(photo.filename)
-        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+
         ext = filename.rsplit('.', 1)[-1].lower()
 
         if ext not in allowed_extensions:
-            return jsonify(error="Invalid image file extension"), 400
+            return jsonify(
+                error="Invalid image file extension"
+            ), 400
 
-        if User.query.filter_by(photo=filename).first():
-            return jsonify(error="Photo already exists"), 409
+        # Upload image to Cloudinary
+        upload_result = cloudinary.uploader.upload(photo)
 
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        photo_filename = filename
+        # Get secure image URL
+        photo_url = upload_result["secure_url"]
 
+    # Create user
     new_user = User(
         username=username,
         password=password,
         name=name,
         email=email,
-        photo=photo_filename
+        photo=photo_url
     )
 
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify(message="User created successfully", user=new_user.to_dict()), 201
+    return jsonify(
+        message="User created successfully",
+        user=new_user.to_dict()
+    ), 201
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():

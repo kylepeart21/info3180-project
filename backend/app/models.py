@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask import url_for
 
+
 profile_interests = db.Table(
     'profile_interests',
     db.Column('profile_id', db.Integer, db.ForeignKey('profiles.id')),
@@ -48,7 +49,7 @@ class User(db.Model):
             "username": self.username,
             "name": self.name,
             "email": self.email,
-            "photo": url_for('get_uploaded_file', filename=self.photo, _external=True) if self.photo else None,
+            "photo": self.photo if self.photo else None,
             "date_joined": self.date_joined.strftime("%Y-%m-%d %H:%M:%S") if self.date_joined else None
         }
 
