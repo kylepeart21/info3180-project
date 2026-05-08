@@ -100,12 +100,28 @@ def profiles():
         profiles = Profile.query.all()
         profile_list = [profile.to_dict() for profile in profiles]
         return jsonify(profiles=profile_list), 200
+
     else:
         data = request.get_json()
 
-        required = ['description', 'parish', 'biography', 'sex',
-                    'race', 'birth_year', 'height', 'fav_cuisine','fav_colour',
-                    'fav_school_subject', 'political', 'religious', 'family_oriented']
+        # Interests list from frontend
+        interests_data = data.get('interests', [])
+
+        required = [
+            'description',
+            'parish',
+            'biography',
+            'sex',
+            'race',
+            'birth_year',
+            'height',
+            'fav_cuisine',
+            'fav_colour',
+            'fav_school_subject',
+            'political',
+            'religious',
+            'family_oriented'
+        ]
 
         if not all(field in data for field in required):
             return jsonify({"error": "Missing required fields"}), 400
@@ -127,11 +143,36 @@ def profiles():
             family_oriented=data['family_oriented']
         )
 
+        # Add interests to profile
+        for interest_name in interests_data:
+
+            # Skip empty values
+            if not interest_name.strip():
+                continue
+
+            # Check if interest already exists
+            interest = Interest.query.filter_by(
+                name=interest_name.strip()
+            ).first()
+
+            # Create new interest if it doesn't exist
+            if not interest:
+                interest = Interest(
+                    name=interest_name.strip()
+                )
+
+                db.session.add(interest)
+
+            # Link interest to profile
+            new_profile.interests.append(interest)
+
         db.session.add(new_profile)
         db.session.commit()
 
-        return jsonify(message="Profile created successfully", profile=new_profile.to_dict()), 201
-
+        return jsonify(
+            message="Profile created successfully",
+            profile=new_profile.to_dict()
+        ), 201
 
 @app.route('/api/profiles/<profile_id>', methods=['GET'])
 @jwt_required()
@@ -357,6 +398,75 @@ def get_top_favourites(N):
 
     return jsonify(result), 200
 
+@app.route('/api/messages', methods=['POST'])
+@jwt_required()
+def send_message():
+
+    sender_id = int(get_jwt_identity())
+
+    data = request.get_json()
+
+    receiver_id = data.get('receiver_id')
+    content = data.get('content')
+
+    if not receiver_id or not content:
+        return jsonify({
+            "error": "receiver_id and content are required"
+        }), 400
+
+    if sender_id == receiver_id:
+        return jsonify({
+            "error": "Cannot message yourself"
+        }), 400
+
+    receiver = User.query.get(receiver_id)
+
+    if not receiver:
+        return jsonify({
+            "error": "Receiver not found"
+        }), 404
+
+    new_message = Message(
+        sender_id=sender_id,
+        receiver_id=receiver_id,
+        content=content
+    )
+
+    db.session.add(new_message)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Message sent successfully",
+        "data": new_message.to_dict()
+    }), 201
+
+@app.route('/api/messages/<int:user_id>', methods=['GET'])
+@jwt_required()
+def get_conversation(user_id):
+
+    current_user_id = int(get_jwt_identity())
+
+    other_user = User.query.get(user_id)
+
+    if not other_user:
+        return jsonify({
+            "error": "User not found"
+        }), 404
+
+    messages = Message.query.filter(
+        (
+            (Message.sender_id == current_user_id) &
+            (Message.receiver_id == user_id)
+        ) |
+        (
+            (Message.sender_id == user_id) &
+            (Message.receiver_id == current_user_id)
+        )
+    ).order_by(Message.timestamp.asc()).all()
+
+    return jsonify({
+        "messages": [message.to_dict() for message in messages]
+    }), 200
 
 @app.route('/')
 def index():

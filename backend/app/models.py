@@ -3,6 +3,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask import url_for
 
+profile_interests = db.Table(
+    'profile_interests',
+    db.Column('profile_id', db.Integer, db.ForeignKey('profiles.id')),
+    db.Column('interest_id', db.Integer, db.ForeignKey('interests.id'))
+)
+
 class User(db.Model):
     __tablename__ = 'users'
     
@@ -46,6 +52,14 @@ class User(db.Model):
             "date_joined": self.date_joined.strftime("%Y-%m-%d %H:%M:%S") if self.date_joined else None
         }
 
+class Interest(db.Model):
+    __tablename__ = 'interests'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Interest {self.name}>'
 
 class Profile(db.Model):
     __tablename__ = 'profiles'
@@ -65,6 +79,11 @@ class Profile(db.Model):
     political = db.Column(db.Boolean)
     religious = db.Column(db.Boolean)
     family_oriented = db.Column(db.Boolean)
+    interests = db.relationship(
+        'Interest',
+        secondary=profile_interests,
+        backref='profiles'
+    )
 
     def __init__(self, user_id_fk, description=None, parish=None, biography=None, sex=None,
                  race=None, birth_year=None, height=None, fav_cuisine=None, fav_colour=None,
@@ -125,7 +144,8 @@ class Profile(db.Model):
             "fav_school_subject": self.fav_school_subject,
             "political": self.political,
             "religious": self.religious,
-            "family_oriented": self.family_oriented
+            "family_oriented": self.family_oriented,
+            "interests": [interest.name for interest in self.interests]
         }
 
 
@@ -142,3 +162,53 @@ class Favourite(db.Model):
     
     def __repr__(self):
         return f'<Favourite {self.id}: User {self.user_id_fk} -> User {self.fav_user_id_fk}>'
+    
+
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    sender_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=False
+    )
+
+    receiver_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=False
+    )
+
+    content = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    timestamp = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    sender = db.relationship(
+        'User',
+        foreign_keys=[sender_id],
+        backref='sent_messages'
+    )
+
+    receiver = db.relationship(
+        'User',
+        foreign_keys=[receiver_id],
+        backref='received_messages'
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "sender_id": self.sender_id,
+            "receiver_id": self.receiver_id,
+            "content": self.content,
+            "timestamp": self.timestamp.isoformat()
+        }
