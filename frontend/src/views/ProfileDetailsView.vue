@@ -2,7 +2,7 @@
 import HeartButton from '@/components/HeartButton.vue'
 import { useAuthStore } from '@/store/authentication.js'
 import apiClient from '@/http.js';
-import {onMounted} from "vue";
+import {onMounted, nextTick} from "vue";
 import {useRouter} from "vue-router";
 
 
@@ -123,10 +123,15 @@ export default {
 
         this.matches = response.data.profiles;
         this.loadingMatches = false;
+
+        // Scroll to matches section after render
+        await nextTick();
+        const el = document.querySelector('.matches-container');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
       } catch (err) {
         console.error('Error finding matches:', err);
         this.loadingMatches = false;
-        this.$toast.error('Failed to load matches. Please try again.');
       }
     },
     
@@ -179,7 +184,7 @@ export default {
           <button class="action-btn pass-btn" @click="passProfile" :disabled="isPassed">
             {{ isPassed ? 'Passed' : 'Pass' }}
           </button>
-          <router-link to="/messages" class="action-btn msg-btn">
+          <router-link :to="`/messages?userId=${profile.user_id_fk}`" class="action-btn msg-btn">
             <span class="btn-icon">💬</span>
             Message
           </router-link>
@@ -281,7 +286,7 @@ export default {
         <div v-else class="matches-list">
           <div v-for="match in matches" :key="match.id" class="match-card">
             <div class="match-image">
-              <img :src="match.image_url || '/default-profile.jpg'" :alt="match.name">
+              <img :src="match.photo || '/default-profile.jpg'" :alt="match.name">
               <div class="compatibility-badge">{{ match.compatibility }}%</div>
             </div>
             <div class="match-info">

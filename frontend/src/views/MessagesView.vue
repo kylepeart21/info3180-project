@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import apiClient from '@/http.js'
 import { useAuthStore } from '@/store/authentication.js'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const currentUserId = computed(() => parseInt(authStore.user_id))
 
@@ -109,8 +110,55 @@ function handleKeydown(e) {
   }
 }
 
+// Watch ?userId query param — fires immediately on mount AND on URL changes
+watch(
+  () => route.query.userId,
+  async (userId) => {
+    if (!userId) return
+    const targetId = parseInt(userId)
+    if (isNaN(targetId)) return
+
+    // If already in conversation list, select it
+    const existing = conversations.value.find(c => c.user.id === targetId)
+    if (existing) {
+      await selectConversation(existing.user)
+      return
+    }
+
+    // No prior conversation — fetch user and open a blank chat
+    try {
+      const res = await apiClient.get(`/api/users/${targetId}`, { headers: headers() })
+      selectedUser.value = res.data.user
+      messages.value = []
+      loadingMessages.value = false
+    } catch (e) {
+      console.error('Could not open chat:', e)
+    }
+  },
+  { immediate: true }
+)
+
 onMounted(async () => {
   await fetchConversations()
+
+  // After conversations load, re-check userId in case it was missed before
+  if (route.query.userId && !selectedUser.value) {
+    const targetId = parseInt(route.query.userId)
+    const existing = conversations.value.find(c => c.user.id === targetId)
+    if (existing) {
+      await selectConversation(existing.user)
+    } else {
+      try {
+        const res = await apiClient.get(`/api/users/${targetId}`, { headers: headers() })
+        selectedUser.value = res.data.user
+        messages.value = []
+        loadingMessages.value = false
+      } catch (e) {
+        console.error('Could not open chat:', e)
+      }
+    }
+  }
+
   pollInterval = setInterval(async () => {
     await fetchConversations()
     if (selectedUser.value) await loadMessages()
@@ -123,7 +171,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="messages-view">
+  <div class="messages-view" :class="{ 'chat-open': selectedUser }">
     <!-- Conversation list -->
     <div class="conversations-panel">
       <div class="panel-header">
