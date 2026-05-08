@@ -163,124 +163,515 @@ async function refreshMutualMatches() {
 </script>
 
 <style scoped>
-.filter-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-right: 8px;
-  margin-bottom: 8px;
+/* =========================
+   PAGE
+========================= */
+
+.container {
+
+  min-height: 100vh;
+
+  padding:
+    140px 40px 80px;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(139,92,246,0.22),
+      transparent 25%
+    ),
+
+    radial-gradient(
+      circle at bottom right,
+      rgba(236,72,153,0.16),
+      transparent 25%
+    ),
+
+    #050816;
+
+  max-width: 1600px;
 }
 
-.filter-btn:hover { background-color: #0056b3; }
-.filter-btn.active { background-color: #333; }
+/* =========================
+   SEARCH PANEL
+========================= */
+
+.search-filters {
+
+  padding: 30px;
+
+  border-radius: 32px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(12,18,32,0.74),
+      rgba(18,24,42,0.6)
+    );
+
+  backdrop-filter: blur(26px);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.35);
+
+  margin-bottom: 60px;
+}
+
+/* =========================
+   SEARCH INPUT
+========================= */
+
+.form-control {
+
+  height: 64px;
+
+  border-radius: 22px !important;
+
+  border:
+    1px solid rgba(255,255,255,0.08) !important;
+
+  background:
+    rgba(255,255,255,0.06) !important;
+
+  color: white !important;
+
+  font-size: 1rem;
+
+  padding: 0 22px;
+
+  backdrop-filter: blur(20px);
+
+  transition: all 0.3s ease;
+}
+
+.form-control::placeholder {
+
+  color:
+    rgba(255,255,255,0.45);
+}
+
+.form-control:focus {
+
+  box-shadow:
+    0 0 24px rgba(139,92,246,0.25) !important;
+
+  border-color:
+    rgba(139,92,246,0.5) !important;
+}
+
+/* =========================
+   FILTER BUTTONS
+========================= */
+
+.filter-buttons {
+
+  display: flex;
+
+  gap: 12px;
+
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+
+  background:
+    rgba(255,255,255,0.06);
+
+  color:
+    rgba(255,255,255,0.82);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  padding: 14px 22px;
+
+  border-radius: 18px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  backdrop-filter: blur(18px);
+}
+
+.filter-btn:hover {
+
+  transform:
+    translateY(-2px);
+
+  background:
+    rgba(139,92,246,0.18);
+
+  color: white;
+}
+
+.filter-btn.active {
+
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #6d28d9
+    );
+
+  color: white;
+
+  box-shadow:
+    0 0 25px rgba(139,92,246,0.35);
+}
+
+/* =========================
+   SECTION TITLES
+========================= */
 
 .section-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #333;
+
+  font-size: 2rem;
+
+  font-weight: 800;
+
+  color: white;
+
+  margin-bottom: 30px;
+
+  letter-spacing: -0.03em;
 }
+
+/* =========================
+   PROFILE GRID
+========================= */
 
 .profiles-grid {
+
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+
+  grid-template-columns:
+    repeat(auto-fill, minmax(340px, 1fr));
+
+  gap: 34px;
 }
+
+/* =========================
+   PROFILE CARD
+========================= */
 
 .profile-card {
+
   position: relative;
+
   width: 100%;
-  height: 300px;
-  border-radius: 10px;
+
+  height: 470px;
+
+  border-radius: 34px;
+
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,0.38);
+
+  transition: all 0.35s ease;
 }
+
+.profile-card:hover {
+
+  transform:
+    translateY(-10px);
+
+  box-shadow:
+    0 28px 50px rgba(0,0,0,0.45);
+}
+
+/* =========================
+   PROFILE IMAGE
+========================= */
 
 .bg-img {
+
   width: 100%;
+
   height: 100%;
+
   object-fit: cover;
-  display: block;
+
+  transition: transform 0.5s ease;
 }
+
+.profile-card:hover .bg-img {
+
+  transform: scale(1.05);
+}
+
+/* =========================
+   OVERLAY
+========================= */
 
 .overlay {
+
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: linear-gradient(transparent, rgba(0,0,0,0.8));
-  padding: 16px 12px 12px;
-  color: white;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  padding: 26px;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,0,0,0.82),
+      rgba(0,0,0,0.15),
+      transparent
+    );
 }
+
+/* =========================
+   TEXT
+========================= */
 
 .text-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+
+  width: 100%;
+
   text-align: center;
-  gap: 4px;
+
+  color: white;
 }
 
-.name { font-weight: 700; font-size: 1rem; margin: 0; }
-.parish { font-size: 0.82rem; margin: 0; color: #ccc; }
+.name {
+
+  font-size: 2rem;
+
+  font-weight: 800;
+
+  margin-bottom: 4px;
+
+  letter-spacing: -0.03em;
+}
+
+.parish {
+
+  color:
+    rgba(255,255,255,0.72);
+
+  margin-bottom: 12px;
+
+  font-size: 1rem;
+}
+
+/* =========================
+   MUTUAL BADGE
+========================= */
 
 .mutual-indicator {
-  background: #28a745;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 8px 16px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(34,197,94,0.2);
+
+  border:
+    1px solid rgba(34,197,94,0.28);
+
+  backdrop-filter: blur(16px);
+
   color: white;
-  border-radius: 12px;
-  padding: 2px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 4px;
+
+  font-size: 0.78rem;
+
+  font-weight: 700;
+
+  margin-bottom: 12px;
 }
 
+/* =========================
+   INTERESTS
+========================= */
+
 .interests-preview {
+
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+
   justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 14px;
 }
 
 .interest-chip {
-  background: rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 2px 8px;
-  font-size: 11px;
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.1);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+
+  font-size: 0.75rem;
+
+  color: white;
 }
 
+/* =========================
+   BUTTONS
+========================= */
+
 .card-btns {
+
   display: flex;
-  gap: 6px;
-  margin-top: 6px;
-  flex-wrap: wrap;
+
   justify-content: center;
+
+  gap: 10px;
+
+  margin-top: 10px;
+
+  flex-wrap: wrap;
 }
 
 .btn-sm {
-  padding: 4px 10px;
-  font-size: 12px;
-  border-radius: 4px;
+
   border: none;
-  cursor: pointer;
-  font-weight: 600;
+
+  padding: 12px 18px;
+
+  border-radius: 16px;
+
+  font-size: 0.82rem;
+
+  font-weight: 700;
+
+  transition: all 0.28s ease;
+
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
 }
 
-.btn-light { background: rgba(255,255,255,0.9); color: #333; }
-.btn-danger { background: #e74c3c; color: white; }
-.btn-secondary { background: rgba(0,0,0,0.5); color: white; }
-.btn-success { background: #28a745; color: white; }
+.btn-sm:hover {
+
+  transform:
+    translateY(-2px);
+}
+
+.btn-light {
+
+  background:
+    rgba(255,255,255,0.92);
+
+  color: #111827;
+}
+
+.btn-danger {
+
+  background:
+    linear-gradient(
+      135deg,
+      #ef4444,
+      #dc2626
+    );
+
+  color: white;
+}
+
+.btn-secondary {
+
+  background:
+    rgba(255,255,255,0.12);
+
+  color: white;
+}
+
+.btn-success {
+
+  background:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #16a34a
+    );
+
+  color: white;
+}
+
+/* =========================
+   NO PROFILES
+========================= */
 
 .no-profiles {
+
+  padding: 70px;
+
+  border-radius: 30px;
+
   text-align: center;
-  padding: 40px;
-  color: #6c757d;
+
+  color:
+    rgba(255,255,255,0.65);
+
+  background:
+    rgba(255,255,255,0.04);
+
+  border:
+    1px solid rgba(255,255,255,0.06);
+
+  backdrop-filter: blur(18px);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .container {
+
+    padding:
+      120px 18px 60px;
+  }
+
+  .profiles-grid {
+
+    grid-template-columns: 1fr;
+  }
+
+  .profile-card {
+
+    height: 440px;
+  }
+
+  .name {
+
+    font-size: 1.7rem;
+  }
 }
 </style>
