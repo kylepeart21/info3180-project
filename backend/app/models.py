@@ -179,7 +179,7 @@ class Profile(db.Model):
                 interest.name for interest in self.interests
             ],
             "name": self.user.name if self.user else None,
-            "photo": url_for('get_uploaded_file', filename=self.user.photo, _external=True) if self.user and self.user.photo else None,
+            "photo": self.user.photo if self.user and self.user.photo else None,
         }
 
 class Favourite(db.Model):
