@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import apiClient from '@/http.js'
 import { useAuthStore } from '@/store/authentication.js'
@@ -110,27 +110,51 @@ function handleKeydown(e) {
   }
 }
 
+// Watch ?userId query param — fires immediately on mount AND on URL changes
+watch(
+  () => route.query.userId,
+  async (userId) => {
+    if (!userId) return
+    const targetId = parseInt(userId)
+    if (isNaN(targetId)) return
+
+    // If already in conversation list, select it
+    const existing = conversations.value.find(c => c.user.id === targetId)
+    if (existing) {
+      await selectConversation(existing.user)
+      return
+    }
+
+    // No prior conversation — fetch user and open a blank chat
+    try {
+      const res = await apiClient.get(`/api/users/${targetId}`, { headers: headers() })
+      selectedUser.value = res.data.user
+      messages.value = []
+      loadingMessages.value = false
+    } catch (e) {
+      console.error('Could not open chat:', e)
+    }
+  },
+  { immediate: true }
+)
+
 onMounted(async () => {
   await fetchConversations()
 
-  // If navigated from a profile page with ?userId=X, open that chat
-  const targetUserId = route.query.userId ? parseInt(route.query.userId) : null
-  if (targetUserId) {
-    // Try to find user in existing conversations first
-    const existing = conversations.value.find(c => c.user.id === targetUserId)
+  // After conversations load, re-check userId in case it was missed before
+  if (route.query.userId && !selectedUser.value) {
+    const targetId = parseInt(route.query.userId)
+    const existing = conversations.value.find(c => c.user.id === targetId)
     if (existing) {
       await selectConversation(existing.user)
     } else {
-      // No prior conversation — fetch the user and open a fresh chat panel
       try {
-        const res = await apiClient.get(`/api/users/${targetUserId}`, { headers: headers() })
-        const user = res.data.user
-        // Manually set selectedUser so the chat panel opens immediately
-        selectedUser.value = user
+        const res = await apiClient.get(`/api/users/${targetId}`, { headers: headers() })
+        selectedUser.value = res.data.user
         messages.value = []
         loadingMessages.value = false
       } catch (e) {
-        console.error('Could not load user for chat:', e)
+        console.error('Could not open chat:', e)
       }
     }
   }
