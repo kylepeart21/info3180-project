@@ -39,3 +39,16 @@ frontend/.env
 .env
 .claude
 .claude/
+
+# Database files
+*.db
+instance/
+
+# Python cache
+*.pyc
+
+# Frontend build
+dist/
+
+# macOS
+.DS_Store
