@@ -89,19 +89,42 @@ def logout():
     revoked_tokens.add(jti)
     return jsonify(message="Successfully logged out"), 200
 
-
 @app.route('/api/profiles', methods=['GET', 'POST'])
 @jwt_required()
 def profiles():
+
     current_user = get_jwt_identity()
     user_id = int(current_user)
 
     if request.method == 'GET':
-        profiles = Profile.query.all()
-        profile_list = [profile.to_dict() for profile in profiles]
+
+        blocked_users = db.session.query(
+            BlockedUser.blocked_id
+        ).filter(
+            BlockedUser.blocker_id == user_id
+        )
+
+        blocked_by_users = db.session.query(
+            BlockedUser.blocker_id
+        ).filter(
+            BlockedUser.blocked_id == user_id
+        )
+
+        profiles = Profile.query.filter(
+            Profile.is_public == True,
+            Profile.user_id_fk != user_id,
+            ~Profile.user_id_fk.in_(blocked_users),
+            ~Profile.user_id_fk.in_(blocked_by_users)
+        ).all()
+
+        profile_list = [
+            profile.to_dict() for profile in profiles
+        ]
+
         return jsonify(profiles=profile_list), 200
 
     else:
+
         data = request.get_json()
 
         # Interests list from frontend
@@ -124,7 +147,19 @@ def profiles():
         ]
 
         if not all(field in data for field in required):
-            return jsonify({"error": "Missing required fields"}), 400
+            return jsonify({
+                "error": "Missing required fields"
+            }), 400
+
+        # Prevent duplicate profiles
+        existing_profile = Profile.query.filter_by(
+            user_id_fk=user_id
+        ).first()
+
+        if existing_profile:
+            return jsonify({
+                "error": "User already has a profile"
+            }), 400
 
         new_profile = Profile(
             user_id_fk=user_id,
@@ -140,7 +175,10 @@ def profiles():
             fav_school_subject=data['fav_school_subject'],
             political=data['political'],
             religious=data['religious'],
-            family_oriented=data['family_oriented']
+            family_oriented=data['family_oriented'],
+
+            # OPTIONAL FEATURE — Public/Private Profiles
+            is_public=data.get('is_public', True)
         )
 
         # Add interests to profile
@@ -157,6 +195,7 @@ def profiles():
 
             # Create new interest if it doesn't exist
             if not interest:
+
                 interest = Interest(
                     name=interest_name.strip()
                 )
@@ -219,6 +258,7 @@ def favourite(user_id):
 @app.route('/api/profiles/matches/<profile_id>', methods=['GET'])
 @jwt_required()
 def get_profile_matches(profile_id):
+
     base_profile = Profile.query.get(profile_id)
 
     if not base_profile:
@@ -230,25 +270,58 @@ def get_profile_matches(profile_id):
     candidates = Profile.query.filter(
         Profile.id != base_profile.id,
         Profile.user_id_fk != base_profile.user_id_fk,
+
+        # OPTIONAL FEATURE — Only show public profiles
+        Profile.is_public == True,
+
         Profile.birth_year.between(age_lower_bound, age_upper_bound),
-        func.abs(Profile.height - base_profile.height).between(3, 10),
+
+        func.abs(
+            Profile.height - base_profile.height
+        ).between(3, 10),
+
     ).all()
+
+    # OPTIONAL FEATURE — Hide blocked users
+    blocked_users = db.session.query(
+        BlockedUser.blocked_id
+    ).filter(
+        BlockedUser.blocker_id == base_profile.user_id_fk
+    )
+
+    blocked_by_users = db.session.query(
+        BlockedUser.blocker_id
+    ).filter(
+        BlockedUser.blocked_id == base_profile.user_id_fk
+    )
 
     matched_profiles = []
 
     for profile in candidates:
+
+        if profile.user_id_fk in blocked_users:
+            continue
+
+        if profile.user_id_fk in blocked_by_users:
+            continue
+
         match_count = 0
 
         if profile.fav_cuisine == base_profile.fav_cuisine:
             match_count += 1
+
         if profile.fav_colour == base_profile.fav_colour:
             match_count += 1
+
         if profile.fav_school_subject == base_profile.fav_school_subject:
             match_count += 1
+
         if profile.political == base_profile.political:
             match_count += 1
+
         if profile.religious == base_profile.religious:
             match_count += 1
+
         if profile.family_oriented == base_profile.family_oriented:
             match_count += 1
 
@@ -266,7 +339,6 @@ def get_profile_matches(profile_id):
             matched_profiles.append(profile.to_dict())
 
     return jsonify(profiles=matched_profiles), 200
-
 
 @app.route('/api/search', methods=['GET'])
 @jwt_required()
@@ -286,7 +358,12 @@ def search():
     date_of_birth = request.args.get('date_of_birth')
 
     query = db.session.query(Profile).join(User)
+
+    # Do not show current user
     query = query.filter(Profile.user_id_fk != user_id)
+
+    # OPTIONAL FEATURE — Only show public profiles
+    query = query.filter(Profile.is_public == True)
 
     if name:
         query = query.filter(func.lower(User.name).like(f"%{name.lower()}%"))
@@ -313,7 +390,22 @@ def search():
         except (ValueError, AttributeError):
             return jsonify({"error": "Invalid date_of_birth format. Use YYYY or YYYY-MM-DD"}), 400
 
-    results  = query.all()
+    # OPTIONAL FEATURE — Hide blocked users
+    blocked_users = db.session.query(BlockedUser.blocked_id).filter(
+        BlockedUser.blocker_id == user_id
+    )
+
+    blocked_by_users = db.session.query(BlockedUser.blocker_id).filter(
+        BlockedUser.blocked_id == user_id
+    )
+
+    query = query.filter(
+        ~Profile.user_id_fk.in_(blocked_users),
+        ~Profile.user_id_fk.in_(blocked_by_users)
+    )
+
+    results = query.all()
+
     profiles = [profile.to_dict() for profile in results]
 
     return jsonify(profiles=profiles), 200
@@ -359,6 +451,45 @@ def get_favourite_users(user_id):
     favourites = query.all()
     return jsonify([user.to_dict() for user in favourites]), 200
 
+@app.route('/api/block/<int:user_id>', methods=['POST'])
+@jwt_required()
+def block_user(user_id):
+
+    blocker_id = int(get_jwt_identity())
+
+    if blocker_id == user_id:
+        return jsonify({
+            "error": "Cannot block yourself"
+        }), 400
+
+    user_to_block = User.query.get(user_id)
+
+    if not user_to_block:
+        return jsonify({
+            "error": "User not found"
+        }), 404
+
+    existing_block = BlockedUser.query.filter_by(
+        blocker_id=blocker_id,
+        blocked_id=user_id
+    ).first()
+
+    if existing_block:
+        return jsonify({
+            "error": "User already blocked"
+        }), 400
+
+    blocked_user = BlockedUser(
+        blocker_id=blocker_id,
+        blocked_id=user_id
+    )
+
+    db.session.add(blocked_user)
+    db.session.commit()
+
+    return jsonify({
+        "message": "User blocked successfully"
+    }), 201
 
 @app.route('/api/users/favourites/<N>', methods=['GET'])
 @jwt_required()
@@ -407,7 +538,6 @@ def get_top_favourites(N):
         result.append(user_data)
 
     return jsonify(result), 200
-
 @app.route('/api/messages', methods=['POST'])
 @jwt_required()
 def send_message():
@@ -436,6 +566,23 @@ def send_message():
             "error": "Receiver not found"
         }), 404
 
+    # OPTIONAL FEATURE — Blocked users cannot message each other
+    blocked = BlockedUser.query.filter(
+        (
+            (BlockedUser.blocker_id == sender_id) &
+            (BlockedUser.blocked_id == receiver_id)
+        ) |
+        (
+            (BlockedUser.blocker_id == receiver_id) &
+            (BlockedUser.blocked_id == sender_id)
+        )
+    ).first()
+
+    if blocked:
+        return jsonify({
+            "error": "Messaging unavailable"
+        }), 403
+
     new_message = Message(
         sender_id=sender_id,
         receiver_id=receiver_id,
@@ -463,6 +610,23 @@ def get_conversation(user_id):
             "error": "User not found"
         }), 404
 
+    # OPTIONAL FEATURE — Blocked users cannot view conversations
+    blocked = BlockedUser.query.filter(
+        (
+            (BlockedUser.blocker_id == current_user_id) &
+            (BlockedUser.blocked_id == user_id)
+        ) |
+        (
+            (BlockedUser.blocker_id == user_id) &
+            (BlockedUser.blocked_id == current_user_id)
+        )
+    ).first()
+
+    if blocked:
+        return jsonify({
+            "error": "Conversation unavailable"
+        }), 403
+
     messages = Message.query.filter(
         (
             (Message.sender_id == current_user_id) &
@@ -477,7 +641,7 @@ def get_conversation(user_id):
     return jsonify({
         "messages": [message.to_dict() for message in messages]
     }), 200
-
+    
 @app.route('/')
 def index():
     return jsonify(message="This is the beginning of our API")

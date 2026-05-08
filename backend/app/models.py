@@ -65,7 +65,13 @@ class Profile(db.Model):
     __tablename__ = 'profiles'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id_fk = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    user_id_fk = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=False
+    )
+
     description = db.Column(db.String(500))
     parish = db.Column(db.String(50))
     biography = db.Column(db.String(1000))
@@ -79,15 +85,38 @@ class Profile(db.Model):
     political = db.Column(db.Boolean)
     religious = db.Column(db.Boolean)
     family_oriented = db.Column(db.Boolean)
+
+    # OPTIONAL FEATURE — Profile Visibility
+    is_public = db.Column(
+        db.Boolean,
+        default=True
+    )
+
     interests = db.relationship(
         'Interest',
         secondary=profile_interests,
         backref='profiles'
     )
 
-    def __init__(self, user_id_fk, description=None, parish=None, biography=None, sex=None,
-                 race=None, birth_year=None, height=None, fav_cuisine=None, fav_colour=None,
-                 fav_school_subject=None, political=None, religious=None, family_oriented=None):
+    def __init__(
+        self,
+        user_id_fk,
+        description=None,
+        parish=None,
+        biography=None,
+        sex=None,
+        race=None,
+        birth_year=None,
+        height=None,
+        fav_cuisine=None,
+        fav_colour=None,
+        fav_school_subject=None,
+        political=None,
+        religious=None,
+        family_oriented=None,
+        is_public=True
+    ):
+
         self.user_id_fk = user_id_fk
         self.description = description
         self.parish = parish
@@ -102,22 +131,20 @@ class Profile(db.Model):
         self.political = political
         self.religious = religious
         self.family_oriented = family_oriented
+        self.is_public = is_public
 
     @property
     def gender(self):
-        """Alias for sex — keeps API responses consistent with the gender search parameter."""
         return self.sex
 
     @property
     def age(self):
-        """Computed age derived from birth_year."""
         if self.birth_year:
             return datetime.now().year - self.birth_year
         return None
 
     @property
     def date_of_birth(self):
-        """Returns birth_year as a string year for consistency with the date_of_birth search parameter."""
         return str(self.birth_year) if self.birth_year else None
 
     def __repr__(self):
@@ -130,11 +157,9 @@ class Profile(db.Model):
             "description": self.description,
             "parish": self.parish,
             "biography": self.biography,
-            # sex and gender both returned so either field name works on the client side
             "sex": self.sex,
             "gender": self.gender,
             "race": self.race,
-            # birth_year and date_of_birth both returned for the same reason
             "birth_year": self.birth_year,
             "date_of_birth": self.date_of_birth,
             "age": self.age,
@@ -145,9 +170,14 @@ class Profile(db.Model):
             "political": self.political,
             "religious": self.religious,
             "family_oriented": self.family_oriented,
-            "interests": [interest.name for interest in self.interests]
-        }
 
+            # OPTIONAL FEATURE
+            "is_public": self.is_public,
+
+            "interests": [
+                interest.name for interest in self.interests
+            ]
+        }
 
 class Favourite(db.Model):
     __tablename__ = 'favourites'
@@ -163,7 +193,30 @@ class Favourite(db.Model):
     def __repr__(self):
         return f'<Favourite {self.id}: User {self.user_id_fk} -> User {self.fav_user_id_fk}>'
     
+class BlockedUser(db.Model):
+    __tablename__ = 'blocked_users'
 
+    id = db.Column(db.Integer, primary_key=True)
+
+    blocker_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=False
+    )
+
+    blocked_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    def __repr__(self):
+        return f'<BlockedUser {self.blocker_id} blocked {self.blocked_id}>'
 
 class Message(db.Model):
     __tablename__ = 'messages'
@@ -212,3 +265,4 @@ class Message(db.Model):
             "content": self.content,
             "timestamp": self.timestamp.isoformat()
         }
+    
