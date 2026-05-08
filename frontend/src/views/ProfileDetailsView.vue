@@ -23,116 +23,79 @@ export default {
     }
   },
   created() {
-    this.fetchProfileDetails()
-    this.checkIfFavorited()
+    this.fetchProfileDetails().then(() => this.checkIfFavorited())
   },
   methods: {
     async fetchProfileDetails() {
       try {
-        const profileId = this.$route.params.profile_id
-        const token = localStorage.getItem('jwt')
-        
-        const response = await apiClient(`/api/profiles/${profileId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch profile details')
-        }
+        const profileId = this.$route.params.profile_id;
+        const token = localStorage.getItem('jwt');
 
-        const json = await response.json();
-        this.profile.value = json.profile;
+        const response = await apiClient.get(`/api/profiles/${profileId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-        this.loading = false
-
+        this.profile = response.data.profile;
+        this.loading = false;
       } catch (err) {
-        this.error = err.message
-        this.loading = false
+        this.error = err.message;
+        this.loading = false;
       }
     },
     
     async checkIfFavorited() {
       try {
-        const profileId = this.$route.params.profile_id
-        const token = localStorage.getItem('jwt')
+        const authStore = useAuthStore();
+        const token = localStorage.getItem('jwt');
 
-        const response = await apiClient.get(`/api/users/${useAuthStore().user_id}/favorites`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        
-        if (!response.ok) {
-          throw new Error('Failed to check favorite status')
-        }
-        
-        const data = await response.json()
-        this.isFavorited = data.isFavorited
+        const response = await apiClient.get(`/api/users/${authStore.user_id}/favourites`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
 
+        const favouriteUserIds = response.data.map(u => u.id);
+        this.isFavorited = favouriteUserIds.includes(this.profile.user_id_fk);
       } catch (err) {
-        console.error('Error checking favorite status:', err)
+        console.error('Error checking favorite status:', err);
       }
     },
     
     async toggleFavorite() {
       try {
-        const profileId = this.$route.params.profile_id
-        const token = localStorage.getItem('jwt')
-        
-        const method = this.isFavorited ? 'DELETE' : 'POST'
-        const url = this.isFavorited 
-          ? `/api/profiles/favourites/${profileId}`
-          : `/api/profiles/favourites`
-        
-        const response = await fetch(url, {
-          method,
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: this.isFavorited ? null : JSON.stringify({ profile_id: profileId })
-        })
-        
-        if (!response.ok) {
-          throw new Error(`Failed to ${this.isFavorited ? 'remove from' : 'add to'} favorites`)
+        const token = localStorage.getItem('jwt');
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        if (this.isFavorited) {
+          await apiClient.delete(`/api/profiles/${this.profile.user_id_fk}/favourite`, { headers });
+        } else {
+          await apiClient.post(`/api/profiles/${this.profile.user_id_fk}/favourite`, {}, { headers });
         }
-        
-        this.isFavorited = !this.isFavorited
-        
-        // Show confirmation message
-        this.$toast.success(`Profile ${this.isFavorited ? 'added to' : 'removed from'} favorites`)
+
+        this.isFavorited = !this.isFavorited;
+        this.$toast.success(`Profile ${this.isFavorited ? 'added to' : 'removed from'} favorites`);
       } catch (err) {
-        console.error('Error toggling favorite:', err)
-        this.$toast.error(err.message)
+        console.error('Error toggling favorite:', err);
+        this.$toast.error(err.message);
       }
     },
     
     async matchMe() {
-      this.showMatches = true
-      this.loadingMatches = true
-      
+      this.showMatches = true;
+      this.loadingMatches = true;
+
       try {
-        const profileId = this.$route.params.profile_id
-        const token = localStorage.getItem('jwt')
-        
-        const response = await fetch(`/api/profiles/matches/${profileId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        
-        if (!response.ok) {
-          throw new Error('Failed to find matches')
-        }
-        
-        this.matches = await response.json()
-        this.loadingMatches = false
+        const profileId = this.$route.params.profile_id;
+        const token = localStorage.getItem('jwt');
+
+        const response = await apiClient.get(`/api/profiles/matches/${profileId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        this.matches = response.data.profiles;
+        this.loadingMatches = false;
       } catch (err) {
-        console.error('Error finding matches:', err)
-        this.loadingMatches = false
-        this.$toast.error('Failed to load matches. Please try again.')
+        console.error('Error finding matches:', err);
+        this.loadingMatches = false;
+        this.$toast.error('Failed to load matches. Please try again.');
       }
     },
     

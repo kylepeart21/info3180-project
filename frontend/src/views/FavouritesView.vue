@@ -81,108 +81,57 @@ export default {
     async fetchFavourites() {
       try {
         this.loading = true;
-        const token = localStorage.getItem('jwt')
-        
-        // Fetch user's favourites
-        const myFavResponse = await apiClient.get('/api/profiles/favourites', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        
-        if (!myFavResponse.ok) {
-          throw new Error('Failed to fetch your favourites')
-        }
-        
-        this.myFavourites = await myFavResponse.json()
-        
-        // Fetch top favourited profiles
-        const topFavResponse = await fetch('/api/profiles/favourites/top', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        
-        if (!topFavResponse.ok) {
-          throw new Error('Failed to fetch top favourited profiles')
-        }
-        
-        this.topFavourites = await topFavResponse.json()
-        this.loading = false
+        const authStore = useAuthStore();
+        const token = localStorage.getItem('jwt');
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        const myFavResponse = await apiClient.get(`/api/users/${authStore.user_id}/favourites`, { headers });
+        this.myFavourites = myFavResponse.data;
+
+        const topFavResponse = await apiClient.get('/api/users/favourites/10', { headers });
+        this.topFavourites = topFavResponse.data;
+
+        this.loading = false;
       } catch (err) {
-        this.error = err.message
-        this.loading = false
+        this.error = err.message;
+        this.loading = false;
       }
     },
     
     async removeFromFavourites(profileId) {
       try {
-        const token = localStorage.getItem('jwt')
-        
-        const response = await fetch(`/api/profiles/favourites/${profileId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        
-        if (!response.ok) {
-          throw new Error('Failed to remove from favourites')
-        }
-        
-        // Remove from local list
-        this.myFavourites = this.myFavourites.filter(profile => profile.id !== profileId)
-        
-        // Update favourite status in top favourites list if present
-        const topIndex = this.topFavourites.findIndex(p => p.id === profileId)
+        const token = localStorage.getItem('jwt');
+        await apiClient.delete(`/api/profiles/${profileId}/favourite`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        this.myFavourites = this.myFavourites.filter(profile => profile.id !== profileId);
+        const topIndex = this.topFavourites.findIndex(p => p.id === profileId);
         if (topIndex !== -1) {
-          this.topFavourites[topIndex].favourite_count -= 1
-          this.topFavourites[topIndex].is_favourited = false
+          this.topFavourites[topIndex].favourite_count -= 1;
+          this.topFavourites[topIndex].is_favourited = false;
         }
-        
-        this.$toast.success('Removed from favourites')
       } catch (err) {
-        console.error('Error removing from favourites:', err)
-        this.$toast.error(err.message)
+        console.error('Error removing from favourites:', err);
       }
     },
     
     async addToFavourites(profileId) {
       try {
-        const token = localStorage.getItem('jwt')
-        
-        const response = await fetch('/api/profiles/favourites', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ profile_id: profileId })
-        })
-        
-        if (!response.ok) {
-          throw new Error('Failed to add to favourites')
-        }
-        
-        // Find the profile in top favourites
-        const profileData = this.topFavourites.find(p => p.id === profileId)
-        
-        // Add to local list if not already exists
+        const token = localStorage.getItem('jwt');
+        await apiClient.post(`/api/profiles/${profileId}/favourite`, {}, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const profileData = this.topFavourites.find(p => p.id === profileId);
         if (!this.myFavourites.some(p => p.id === profileId) && profileData) {
-          this.myFavourites.push(profileData)
+          this.myFavourites.push(profileData);
         }
-        
-        // Update favourite status in top favourites list
-        const topIndex = this.topFavourites.findIndex(p => p.id === profileId)
+        const topIndex = this.topFavourites.findIndex(p => p.id === profileId);
         if (topIndex !== -1) {
-          this.topFavourites[topIndex].favourite_count += 1
-          this.topFavourites[topIndex].is_favourited = true
+          this.topFavourites[topIndex].favourite_count += 1;
+          this.topFavourites[topIndex].is_favourited = true;
         }
-        
-        this.$toast.success('Added to favourites')
       } catch (err) {
-        console.error('Error adding to favourites:', err)
-        this.$toast.error(err.message)
+        console.error('Error adding to favourites:', err);
       }
     },
     

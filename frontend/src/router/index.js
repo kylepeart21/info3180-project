@@ -42,14 +42,14 @@ const router = createRouter({
       component: NewProfileView
     },
     {
-      path: '/profiles/:profile_id',
-      name: 'Profile Details',
-      component: ProfileDetailsView
-    },
-    {
       path: '/profiles/favourites',
       name: 'Show User Favourites',
       component: FavouritesView
+    },
+    {
+      path: '/profiles/:profile_id',
+      name: 'Profile Details',
+      component: ProfileDetailsView
     }
   ]
 })
