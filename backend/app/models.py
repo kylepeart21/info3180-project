@@ -49,7 +49,7 @@ class User(db.Model):
             "username": self.username,
             "name": self.name,
             "email": self.email,
-            "photo": self.photo if self.photo else None,
+            "photo": self.photo,
             "date_joined": self.date_joined.strftime("%Y-%m-%d %H:%M:%S") if self.date_joined else None
         }
 
