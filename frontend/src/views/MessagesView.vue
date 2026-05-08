@@ -171,7 +171,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="messages-view">
+  <div class="messages-view" :class="{ 'chat-open': selectedUser }">
     <!-- Conversation list -->
     <div class="conversations-panel">
       <div class="panel-header">
