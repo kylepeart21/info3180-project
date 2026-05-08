@@ -138,6 +138,7 @@ const menuOpen = ref(false)
 
 <style scoped>
 
+
 /* =========================
    HEADER WRAPPER
 ========================= */
@@ -146,19 +147,19 @@ const menuOpen = ref(false)
 
   position: fixed;
 
-  top: 20px;
+  top: 18px;
 
   left: 0;
 
   width: 100%;
 
-  z-index: 1000;
-
-  padding: 0 20px;
+  z-index: 2000;
 
   display: flex;
 
   justify-content: center;
+
+  padding: 0 20px;
 }
 
 /* =========================
@@ -169,9 +170,11 @@ const menuOpen = ref(false)
 
   width: 100%;
 
-  max-width: 1380px;
+  max-width: 1400px;
 
-  padding: 16px 26px;
+  height: 78px;
+
+  padding: 0 26px;
 
   display: flex;
 
@@ -179,15 +182,24 @@ const menuOpen = ref(false)
 
   justify-content: space-between;
 
-  border-radius: 28px;
-
-  backdrop-filter: blur(24px);
+  border-radius: 30px;
 
   background:
-    rgba(255,255,255,0.06);
+    linear-gradient(
+      135deg,
+      rgba(8,12,24,0.82),
+      rgba(15,23,42,0.72)
+    );
+
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
 
   border:
     1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 /* =========================
@@ -227,13 +239,15 @@ const menuOpen = ref(false)
 
 .brand-text {
 
+  color: white;
+
   font-size: 1.4rem;
 
   font-weight: 800;
 
   letter-spacing: -0.03em;
 
-  color: white;
+  opacity: 0.96;
 }
 
 /* =========================
@@ -246,29 +260,31 @@ const menuOpen = ref(false)
 
   align-items: center;
 
-  gap: 12px;
+  gap: 10px;
 }
 
 /* =========================
-   NAV LINKS
+   LINKS
 ========================= */
 
 .nav-link {
 
   position: relative;
 
-  padding: 12px 18px;
+  padding: 13px 18px;
 
-  border-radius: 16px;
+  border-radius: 18px;
 
   color:
-    rgba(255,255,255,0.82);
+    rgba(255,255,255,0.72);
+
+  font-size: 0.95rem;
 
   font-weight: 600;
 
   text-decoration: none;
 
-  transition: all 0.3s ease;
+  transition: all 0.28s ease;
 }
 
 /* HOVER */
@@ -284,17 +300,21 @@ const menuOpen = ref(false)
     translateY(-2px);
 }
 
-/* ACTIVE LINK */
+/* ACTIVE */
 
 .nav-link.router-link-active {
 
   background:
-    rgba(139,92,246,0.18);
+    linear-gradient(
+      135deg,
+      rgba(139,92,246,0.22),
+      rgba(236,72,153,0.16)
+    );
 
   color: white;
 
   box-shadow:
-    0 0 22px rgba(139,92,246,0.24);
+    0 0 24px rgba(139,92,246,0.24);
 }
 
 /* =========================
@@ -313,7 +333,7 @@ const menuOpen = ref(false)
   color: white !important;
 
   box-shadow:
-    0 8px 24px rgba(139,92,246,0.28);
+    0 8px 26px rgba(139,92,246,0.32);
 }
 
 .login-btn:hover {
@@ -322,7 +342,7 @@ const menuOpen = ref(false)
     translateY(-3px);
 
   box-shadow:
-    0 10px 28px rgba(139,92,246,0.4);
+    0 12px 30px rgba(139,92,246,0.45);
 }
 
 /* =========================
@@ -335,20 +355,29 @@ const menuOpen = ref(false)
     rgba(239,68,68,0.14);
 
   color: #fca5a5;
+
+  border:
+    1px solid rgba(239,68,68,0.12);
+}
+
+.logout-btn:hover {
+
+  background:
+    rgba(239,68,68,0.22);
 }
 
 /* =========================
-   MOBILE TOGGLE
+   MOBILE BUTTON
 ========================= */
 
 .mobile-toggle {
 
   display: none;
 
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
 
-  border-radius: 14px;
+  border-radius: 16px;
 
   border: none;
 
@@ -357,9 +386,17 @@ const menuOpen = ref(false)
 
   color: white;
 
-  font-size: 1.2rem;
+  font-size: 1.15rem;
 
   cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+.mobile-toggle:hover {
+
+  background:
+    rgba(255,255,255,0.12);
 }
 
 /* =========================
@@ -381,21 +418,23 @@ const menuOpen = ref(false)
 
     position: absolute;
 
-    top: 85px;
+    top: 92px;
     left: 0;
 
     width: 100%;
 
     flex-direction: column;
 
-    padding: 20px;
+    gap: 14px;
 
-    border-radius: 24px;
+    padding: 24px;
+
+    border-radius: 28px;
 
     background:
-      rgba(15,23,42,0.92);
+      rgba(8,12,24,0.92);
 
-    backdrop-filter: blur(24px);
+    backdrop-filter: blur(28px);
 
     border:
       1px solid rgba(255,255,255,0.08);
@@ -405,7 +444,7 @@ const menuOpen = ref(false)
     pointer-events: none;
 
     transform:
-      translateY(-10px);
+      translateY(-12px);
 
     transition: all 0.3s ease;
   }
@@ -427,5 +466,4 @@ const menuOpen = ref(false)
     text-align: center;
   }
 }
-
 </style>
