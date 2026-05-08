@@ -1,242 +1,529 @@
+/* =========================
+   ROOT VARIABLES
+========================= */
+
 :root {
 
-    /* PRIMARY COLORS */
-    --primary: #7c5cff;
-    --primary-dark: #5f44d6;
-    --secondary: #ff6ec7;
+    /* BRAND COLORS */
+    --primary: #8b5cf6;
+    --primary-dark: #6d28d9;
+
+    --secondary: #ec4899;
+    --secondary-dark: #be185d;
+
+    --accent: #38bdf8;
 
     /* BACKGROUNDS */
-    --background: #0f172a;
-    --background-light: #1e293b;
+    --background: #070b17;
+    --background-light: #111827;
     --background-card: rgba(255,255,255,0.08);
 
     /* TEXT */
     --text-main: #ffffff;
-    --text-muted: #cbd5e1;
+    --text-muted: rgba(255,255,255,0.72);
 
     /* BORDERS */
-    --border-glass: rgba(255,255,255,0.15);
+    --border-glass: rgba(255,255,255,0.12);
 
-    /* STATUS COLORS */
+    /* STATUS */
     --success: #22c55e;
     --danger: #ef4444;
+    --warning: #f59e0b;
 
     /* SHADOWS */
     --shadow-lg:
-        0 10px 30px rgba(0,0,0,0.35);
+        0 12px 40px rgba(0,0,0,0.35);
 
     --shadow-glow:
-        0 0 30px rgba(124,92,255,0.25);
+        0 0 40px rgba(139,92,246,0.28);
+
+    --shadow-card:
+        0 8px 32px rgba(0,0,0,0.45);
 
     /* RADIUS */
-    --radius-lg: 28px;
-    --radius-md: 20px;
+    --radius-xl: 32px;
+    --radius-lg: 24px;
+    --radius-md: 18px;
     --radius-sm: 14px;
 
-    /* SPACING */
-    --section-gap: 40px;
+    /* TRANSITIONS */
+    --transition:
+        all 0.35s cubic-bezier(.4,0,.2,1);
 }
 
-/* RESET */
+/* =========================
+   RESET
+========================= */
+
 *,
 *::before,
 *::after {
+
     box-sizing: border-box;
+
     margin: 0;
     padding: 0;
 }
 
-/* BODY */
+/* =========================
+   HTML + BODY
+========================= */
+
+html {
+
+    scroll-behavior: smooth;
+}
+
 body {
+
     min-height: 100vh;
 
-    background:
-        radial-gradient(
-            circle at top left,
-            rgba(124,92,255,0.35),
-            transparent 35%
-        ),
-
-        radial-gradient(
-            circle at bottom right,
-            rgba(255,110,199,0.25),
-            transparent 30%
-        ),
-
-        #0f172a;
+    overflow-x: hidden;
 
     color: var(--text-main);
-
-    line-height: 1.6;
 
     font-family:
         Inter,
         -apple-system,
         BlinkMacSystemFont,
         'Segoe UI',
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        'Helvetica Neue',
         sans-serif;
 
     font-size: 15px;
 
+    line-height: 1.6;
+
     text-rendering: optimizeLegibility;
+
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    overflow-x: hidden;
+    background:
+
+        radial-gradient(
+            circle at top left,
+            rgba(139,92,246,0.35),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at top right,
+            rgba(236,72,153,0.22),
+            transparent 25%
+        ),
+
+        radial-gradient(
+            circle at bottom right,
+            rgba(56,189,248,0.15),
+            transparent 30%
+        ),
+
+        linear-gradient(
+            180deg,
+            #070b17 0%,
+            #0f172a 100%
+        );
+
+    background-attachment: fixed;
 }
 
-/* LINKS */
+/* =========================
+   LIQUID GLOW LAYERS
+========================= */
+
+body::before,
+body::after {
+
+    content: "";
+
+    position: fixed;
+
+    width: 500px;
+    height: 500px;
+
+    border-radius: 50%;
+
+    filter: blur(120px);
+
+    opacity: 0.22;
+
+    pointer-events: none;
+
+    z-index: -1;
+}
+
+body::before {
+
+    background: #8b5cf6;
+
+    top: -150px;
+    left: -100px;
+}
+
+body::after {
+
+    background: #ec4899;
+
+    bottom: -150px;
+    right: -100px;
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    letter-spacing: -0.02em;
+}
+
+p {
+
+    color: var(--text-muted);
+}
+
 a {
+
     text-decoration: none;
+
     color: inherit;
 }
 
-/* IMAGES */
+/* =========================
+   IMAGES
+========================= */
+
 img {
+
     display: block;
-    max-width: 100%;
+
+    width: 100%;
+
+    object-fit: cover;
 }
 
-/* BUTTONS */
+/* =========================
+   BUTTONS
+========================= */
+
 button {
+
     border: none;
+
     outline: none;
+
     cursor: pointer;
+
     font-family: inherit;
-}
 
-/* GLASS CARD */
-.glass-card {
-
-    background: rgba(255,255,255,0.08);
-
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-
-    border: 1px solid rgba(255,255,255,0.15);
-
-    border-radius: 28px;
-
-    box-shadow:
-        0 8px 32px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.08);
-
-    transition: all 0.3s ease;
-}
-
-/* HOVER EFFECT */
-.glass-card:hover {
-    transform: translateY(-4px);
-    box-shadow:
-        0 10px 35px rgba(124,92,255,0.25),
-        inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: var(--transition);
 }
 
 /* PRIMARY BUTTON */
+
 .primary-btn {
 
-    background: linear-gradient(
-        135deg,
-        #7c5cff,
-        #5f44d6
-    );
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
 
     color: white;
 
-    padding: 12px 24px;
+    padding: 14px 24px;
 
-    border-radius: 16px;
+    border-radius: 18px;
 
-    font-weight: 600;
+    font-weight: 700;
 
-    transition: all 0.3s ease;
+    box-shadow:
+        0 6px 20px rgba(139,92,246,0.32);
+
+    transition: var(--transition);
 }
 
 .primary-btn:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 20px rgba(124,92,255,0.45);
+
+    transform:
+        translateY(-3px)
+        scale(1.02);
+
+    box-shadow:
+        0 12px 28px rgba(139,92,246,0.42);
 }
 
 /* SUCCESS BUTTON */
+
 .success-btn {
 
-    background: var(--success);
+    background:
+        linear-gradient(
+            135deg,
+            #22c55e,
+            #16a34a
+        );
 
     color: white;
 
-    padding: 10px 20px;
+    padding: 12px 20px;
 
-    border-radius: 14px;
+    border-radius: 16px;
 
-    font-weight: 600;
+    font-weight: 700;
 }
 
 /* DANGER BUTTON */
+
 .danger-btn {
 
-    background: var(--danger);
+    background:
+        linear-gradient(
+            135deg,
+            #ef4444,
+            #dc2626
+        );
 
     color: white;
 
-    padding: 10px 20px;
+    padding: 12px 20px;
 
-    border-radius: 14px;
+    border-radius: 16px;
 
-    font-weight: 600;
+    font-weight: 700;
 }
 
-/* INPUTS */
+/* =========================
+   INPUTS
+========================= */
+
 input,
 textarea,
 select {
 
     width: 100%;
 
-    padding: 14px 18px;
+    padding: 16px 18px;
 
-    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
 
-    border: 1px solid rgba(255,255,255,0.12);
+    border:
+        1px solid rgba(255,255,255,0.08);
 
-    border-radius: 16px;
+    background:
+        rgba(255,255,255,0.06);
 
     color: white;
 
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
     outline: none;
 
-    transition: all 0.3s ease;
+    transition: var(--transition);
 }
 
 input:focus,
 textarea:focus,
 select:focus {
 
-    border-color: var(--primary);
+    border-color:
+        rgba(139,92,246,0.7);
 
     box-shadow:
-        0 0 0 3px rgba(124,92,255,0.2);
+        0 0 0 4px rgba(139,92,246,0.18);
 }
 
-/* PLACEHOLDERS */
 ::placeholder {
-    color: rgba(255,255,255,0.55);
+
+    color:
+        rgba(255,255,255,0.45);
 }
 
-/* SCROLLBAR */
+/* =========================
+   GLASS CARD
+========================= */
+
+.glass-card {
+
+    position: relative;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,0.10),
+            rgba(255,255,255,0.04)
+        );
+
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+
+    border:
+        1px solid rgba(255,255,255,0.10);
+
+    border-radius: var(--radius-xl);
+
+    box-shadow:
+        var(--shadow-card);
+
+    overflow: hidden;
+
+    transition: var(--transition);
+}
+
+/* LIQUID SHINE */
+
+.glass-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,0.12),
+            transparent 40%
+        );
+
+    pointer-events: none;
+}
+
+/* HOVER */
+
+.glass-card:hover {
+
+    transform:
+        translateY(-6px);
+
+    box-shadow:
+        0 18px 45px rgba(139,92,246,0.18);
+}
+
+/* =========================
+   PROFILE CARD
+========================= */
+
+.profile-card {
+
+    overflow: hidden;
+
+    border-radius: 32px;
+
+    transition: var(--transition);
+
+    cursor: pointer;
+}
+
+.profile-card:hover {
+
+    transform:
+        translateY(-10px)
+        scale(1.015);
+}
+
+.profile-card img {
+
+    transition:
+        transform 0.6s ease;
+}
+
+.profile-card:hover img {
+
+    transform: scale(1.06);
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
 ::-webkit-scrollbar {
+
     width: 8px;
 }
 
 ::-webkit-scrollbar-track {
+
     background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,0.15);
+
+    border-radius: 999px;
+}
+
+/* =========================
+   SELECTION
+========================= */
+
+::selection {
+
+    background:
+        rgba(139,92,246,0.45);
+
+    color: white;
+}
+
+/* =========================
+   CONTAINERS
+========================= */
+
+.container-modern {
+
+    width: min(1400px, 92%);
+
+    margin-inline: auto;
+}
+
+/* =========================
+   SECTION SPACING
+========================= */
+
+.section {
+
+    padding: 48px 0;
+}
+
+/* =========================
+   BADGES / PILLS
+========================= */
+
+.pill {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 8px 14px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(10px);
+
+    font-size: 0.82rem;
+
+    color: white;
 }

@@ -1,116 +1,392 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
-  <div class="home-hero">
-    <div class="overlay">
-      <div class="glass-card">
-        <h1 class="logo">Jam Date</h1>
-        <p class="tagline">UWI's #1 place to meet real people.</p>
-        <div class="btn-row">
-          <RouterLink to="/register" class="btn btn-primary">
-            <i class="fas fa-user-plus"></i> Register
-          </RouterLink>
-          <RouterLink to="/login" class="btn btn-outline">
-            <i class="fas fa-sign-in-alt"></i> Login
-          </RouterLink>
+
+  <section class="hero-page">
+
+    <!-- BACKGROUND GLOW -->
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+
+    <!-- HERO CONTENT -->
+    <div class="hero-container">
+
+      <div class="hero-content glass-card">
+
+        <!-- TOP BADGE -->
+        <div class="hero-badge">
+          ✨ Jamaica's Modern Dating Experience
         </div>
+
+        <!-- TITLE -->
+        <h1 class="hero-title">
+
+          Meet Real People.
+          <br>
+
+          Build Real Connections.
+
+        </h1>
+
+        <!-- DESCRIPTION -->
+        <p class="hero-description">
+
+          Discover meaningful relationships through
+          a premium modern dating platform designed
+          for authentic connections, compatibility,
+          and genuine interaction.
+
+        </p>
+
+        <!-- CTA BUTTONS -->
+        <div class="hero-actions">
+
+          <RouterLink
+            to="/register"
+            class="primary-btn hero-btn"
+          >
+            Create Account
+          </RouterLink>
+
+          <RouterLink
+            to="/login"
+            class="secondary-btn hero-btn"
+          >
+            Login
+          </RouterLink>
+
+        </div>
+
+        <!-- STATS -->
+        <div class="hero-stats">
+
+          <div class="stat-item">
+            <h3>5K+</h3>
+            <p>Users</p>
+          </div>
+
+          <div class="stat-item">
+            <h3>1K+</h3>
+            <p>Matches</p>
+          </div>
+
+          <div class="stat-item">
+            <h3>24/7</h3>
+            <p>Connections</p>
+          </div>
+
+        </div>
+
       </div>
+
     </div>
-  </div>
+
+  </section>
+
 </template>
 
-<style>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+<style scoped>
 
+/* =========================
+   HERO PAGE
+========================= */
 
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-}
+.hero-page {
 
-.home-hero {
-  background: url('/site-background.jpg') center/cover no-repeat;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+
+  min-height: 100vh;
+
   overflow: hidden;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 40px 20px;
 }
 
-.overlay {
-  background-color: rgba(0, 0, 0, 0.55);
+/* =========================
+   BACKGROUND GLOWS
+========================= */
+
+.hero-glow {
+
+  position: absolute;
+
+  border-radius: 50%;
+
+  filter: blur(120px);
+
+  opacity: 0.25;
+
+  pointer-events: none;
+}
+
+.hero-glow-1 {
+
+  width: 420px;
+  height: 420px;
+
+  background: #8b5cf6;
+
+  top: -100px;
+  left: -120px;
+}
+
+.hero-glow-2 {
+
+  width: 360px;
+  height: 360px;
+
+  background: #ec4899;
+
+  bottom: -120px;
+  right: -80px;
+}
+
+/* =========================
+   HERO CONTAINER
+========================= */
+
+.hero-container {
+
   width: 100%;
-  height: 100%;
+
+  max-width: 1200px;
+
   display: flex;
-  align-items: center;
+
   justify-content: center;
+
+  align-items: center;
+
+  z-index: 2;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 40px;
-  max-width: 500px;
+/* =========================
+   HERO CONTENT
+========================= */
+
+.hero-content {
+
+  width: 100%;
+
+  max-width: 720px;
+
+  padding: 60px;
+
   text-align: center;
-  color: white;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(10px);
+
+  border-radius: 36px;
 }
 
-.logo {
-  font-size: 3rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
+/* =========================
+   HERO BADGE
+========================= */
 
-.tagline {
-  font-size: 1.1rem;
-  margin-bottom: 30px;
-}
+.hero-badge {
 
-.btn-row {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
+  display: inline-flex;
 
-.btn {
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
   align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  transition: all 0.2s ease-in-out;
+
+  justify-content: center;
+
+  padding: 10px 18px;
+
+  margin-bottom: 28px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+
+  color: rgba(255,255,255,0.92);
+
+  font-size: 0.9rem;
+
+  font-weight: 600;
 }
 
-.btn-primary {
-  background-color: #00b894;
+/* =========================
+   TITLE
+========================= */
+
+.hero-title {
+
+  font-size: clamp(3rem, 8vw, 5.8rem);
+
+  font-weight: 800;
+
+  line-height: 1;
+
+  letter-spacing: -0.05em;
+
+  margin-bottom: 24px;
+
   color: white;
-  border: none;
 }
 
-.btn-primary:hover {
-  background-color: #019875;
+/* =========================
+   DESCRIPTION
+========================= */
+
+.hero-description {
+
+  max-width: 620px;
+
+  margin: 0 auto 42px;
+
+  font-size: 1.15rem;
+
+  line-height: 1.8;
+
+  color:
+    rgba(255,255,255,0.72);
 }
 
-.btn-outline {
-  border: 2px solid #00b894;
-  color: #00b894;
-  background: transparent;
+/* =========================
+   BUTTONS
+========================= */
+
+.hero-actions {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 18px;
+
+  margin-bottom: 52px;
+
+  flex-wrap: wrap;
 }
 
-.btn-outline:hover {
-  background: #00b894;
+.hero-btn {
+
+  min-width: 180px;
+
+  padding: 16px 24px;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  border-radius: 20px;
+
+  text-align: center;
+}
+
+/* SECONDARY BUTTON */
+
+.secondary-btn {
+
+  background:
+    rgba(255,255,255,0.08);
+
   color: white;
+
+  border:
+    1px solid rgba(255,255,255,0.1);
+
+  backdrop-filter: blur(12px);
+
+  transition: all 0.35s ease;
 }
+
+.secondary-btn:hover {
+
+  background:
+    rgba(255,255,255,0.14);
+
+  transform:
+    translateY(-3px);
+}
+
+/* =========================
+   STATS
+========================= */
+
+.hero-stats {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 60px;
+
+  flex-wrap: wrap;
+}
+
+.stat-item {
+
+  text-align: center;
+}
+
+.stat-item h3 {
+
+  font-size: 2rem;
+
+  font-weight: 800;
+
+  color: white;
+
+  margin-bottom: 4px;
+}
+
+.stat-item p {
+
+  color:
+    rgba(255,255,255,0.65);
+
+  font-size: 0.95rem;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+  .hero-content {
+
+    padding: 40px 28px;
+  }
+
+  .hero-title {
+
+    font-size: 3.2rem;
+  }
+
+  .hero-description {
+
+    font-size: 1rem;
+  }
+
+  .hero-stats {
+
+    gap: 28px;
+  }
+
+  .hero-actions {
+
+    flex-direction: column;
+  }
+
+  .hero-btn {
+
+    width: 100%;
+  }
+}
+
 </style>
