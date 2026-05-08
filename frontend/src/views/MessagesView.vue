@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import apiClient from '@/http.js'
 import { useAuthStore } from '@/store/authentication.js'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const currentUserId = computed(() => parseInt(authStore.user_id))
 
@@ -111,6 +112,25 @@ function handleKeydown(e) {
 
 onMounted(async () => {
   await fetchConversations()
+
+  // If navigated from a profile page with ?userId=X, open that chat
+  const targetUserId = route.query.userId ? parseInt(route.query.userId) : null
+  if (targetUserId) {
+    // Try to find user in existing conversations
+    let target = conversations.value.find(c => c.user.id === targetUserId)
+    if (target) {
+      await selectConversation(target.user)
+    } else {
+      // User not in conversations yet — fetch their info and open chat
+      try {
+        const res = await apiClient.get(`/api/users/${targetUserId}`, { headers: headers() })
+        await selectConversation(res.data.user)
+      } catch (e) {
+        console.error('Could not load user for chat:', e)
+      }
+    }
+  }
+
   pollInterval = setInterval(async () => {
     await fetchConversations()
     if (selectedUser.value) await loadMessages()

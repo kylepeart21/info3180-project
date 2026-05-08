@@ -225,14 +225,21 @@ def profiles():
 def get_mutual_matches():
     current_user_id = int(get_jwt_identity())
 
-    my_favs = db.session.query(Favourite.fav_user_id_fk).filter(
-        Favourite.user_id_fk == current_user_id
-    )
+    # Alias so we can self-join favourites
+    f1 = db.aliased(Favourite)
+    f2 = db.aliased(Favourite)
 
-    mutual_user_ids = db.session.query(Favourite.user_id_fk).filter(
-        Favourite.user_id_fk.in_(my_favs),
-        Favourite.fav_user_id_fk == current_user_id
-    )
+    # f1 = rows where I liked someone
+    # f2 = rows where that someone liked me back
+    mutual_user_ids = db.session.query(f1.fav_user_id_fk).join(
+        f2,
+        db.and_(
+            f1.fav_user_id_fk == f2.user_id_fk,   # The person I liked also liked...
+            f2.fav_user_id_fk == f1.user_id_fk    # ...me back
+        )
+    ).filter(
+        f1.user_id_fk == current_user_id           # I am the one who liked first
+    ).subquery()
 
     mutual_profiles = Profile.query.filter(
         Profile.user_id_fk.in_(mutual_user_ids),
