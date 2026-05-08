@@ -47,6 +47,7 @@
         <div v-for="profile in filteredProfiles" :key="profile.id" class="profile-card-wrapper">
           <div class="profile-card">
             <img :src="profile.photo || '/default-profile.jpg'" alt="Profile Image" class="bg-img" />
+            <div class="glass-reflection"></div>
             <div class="overlay">
               <div class="text-block">
                 <p class="name">{{ profile.name }}</p>
@@ -94,8 +95,14 @@ onMounted(async () => {
       apiClient.get('/api/profiles', { headers: headers() }),
       apiClient.get('/api/profiles/mutual-matches', { headers: headers() })
     ])
-    profiles.value = profilesRes.data.profiles
-    mutualMatches.value = mutualRes.data.profiles
+    profiles.value =
+      profilesRes.data.profiles.filter(
+        p => !p.is_blocked
+      )
+    mutualMatches.value =
+      mutualRes.data.profiles.filter(
+        p => !p.is_blocked
+      )
   } catch (error) {
     console.error(error)
   } finally {
