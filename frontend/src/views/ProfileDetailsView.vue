@@ -140,13 +140,22 @@ export default {
       return currentYear - birthYear
     },
     
-    formatHeight(heightInInches) {
-      if (!heightInInches) return 'Not specified'
-      
-      const feet = Math.floor(heightInInches / 12)
-      const inches = heightInInches % 12
-      return `${feet}'${inches}"`
-    },
+    formatHeight(cm) {
+
+        if (!cm)
+          return 'Not specified'
+
+        // Convert cm to inches
+        const totalInches = cm / 2.54
+
+        // Feet
+        const feet = Math.floor(totalInches / 12)
+
+        // Remaining inches
+        const inches = Math.round(totalInches % 12)
+
+        return `${feet}'${inches}"`
+      },
     
     sendEmail() {
       // This function is a placeholder for the "Email Profile" functionality
