@@ -21,69 +21,159 @@ def get_uploaded_file(filename):
 @app.route('/api/register', methods=['POST'])
 def register():
 
-    if not request.content_type.startswith('multipart/form-data'):
-        return jsonify(error="Unsupported content type"), 415
+    try:
 
-    username = request.form.get('username')
-    password = request.form.get('password')
-    name = request.form.get('name')
-    email = request.form.get('email')
-
-    photo = request.files.get('photo')
-
-    if not all([username, password, name, email]):
-        return jsonify(error="Missing required fields"), 400
-
-    # Check duplicates
-    if User.query.filter_by(username=username).first():
-        return jsonify(error="Username already exists"), 409
-
-    if User.query.filter_by(email=email).first():
-        return jsonify(error="Email already exists"), 409
-
-    # CLOUDINARY IMAGE UPLOAD
-    photo_url = None
-
-    if photo:
-
-        allowed_extensions = {
-            'png',
-            'jpg',
-            'jpeg',
-            'gif'
-        }
-
-        filename = secure_filename(photo.filename)
-
-        ext = filename.rsplit('.', 1)[-1].lower()
-
-        if ext not in allowed_extensions:
+        # CHECK CONTENT TYPE
+        if not request.content_type.startswith(
+            'multipart/form-data'
+        ):
             return jsonify(
-                error="Invalid image file extension"
+                error="Unsupported content type"
+            ), 415
+
+        # FORM DATA
+        username = request.form.get('username')
+        password = request.form.get('password')
+        name = request.form.get('name')
+        email = request.form.get('email')
+
+        # FILE
+        photo = request.files.get('photo')
+
+        # REQUIRED FIELDS
+        if not all([
+            username,
+            password,
+            name,
+            email
+        ]):
+            return jsonify(
+                error="Missing required fields"
             ), 400
 
-        # Upload image to Cloudinary
-        upload_result = cloudinary.uploader.upload(photo)
+        # DUPLICATE USERNAME
+        if User.query.filter_by(
+            username=username
+        ).first():
 
-        # Get secure image URL
-        photo_url = upload_result["secure_url"]
+            return jsonify(
+                error="Username already exists"
+            ), 409
 
-    # Create user
-    new_user = User(
-        username=username,
-        password=password,
-        name=name,
-        email=email,
-        photo=photo_url
-    )
+        # DUPLICATE EMAIL
+        if User.query.filter_by(
+            email=email
+        ).first():
 
-    db.session.add(new_user)
-    db.session.commit()
+            return jsonify(
+                error="Email already exists"
+            ), 409
 
-    return jsonify(
-        message="User created successfully",
-        user=new_user.to_dict()
-    ), 201
+        # DEFAULT PHOTO URL
+        photo_url = None
+
+        # =========================
+        # CLOUDINARY IMAGE UPLOAD
+        # =========================
+
+        if photo and photo.filename != '':
+
+            allowed_extensions = {
+                'png',
+                'jpg',
+                'jpeg',
+                'gif',
+                'webp'
+            }
+
+            filename = secure_filename(
+                photo.filename
+            )
+
+            # CHECK EXTENSION
+            if '.' not in filename:
+
+                return jsonify(
+                    error="Invalid file"
+                ), 400
+
+            ext = filename.rsplit(
+                '.',
+                1
+            )[-1].lower()
+
+            if ext not in allowed_extensions:
+
+                return jsonify(
+                    error="Invalid image extension"
+                ), 400
+
+            try:
+
+                upload_result = cloudinary.uploader.upload(
+                    photo,
+                    folder="jamdate_profiles"
+                )
+
+                photo_url = upload_result.get(
+                    "secure_url"
+                )
+
+            except Exception as cloudinary_error:
+
+                print(
+                    "CLOUDINARY ERROR:",
+                    str(cloudinary_error)
+                )
+
+                return jsonify({
+                    "error":
+                    "Cloudinary upload failed",
+
+                    "details":
+                    str(cloudinary_error)
+                }), 500
+
+        # =========================
+        # CREATE USER
+        # =========================
+
+        new_user = User(
+            username=username,
+            password=password,
+            name=name,
+            email=email,
+            photo=photo_url
+        )
+
+        db.session.add(new_user)
+
+        db.session.commit()
+
+        # SUCCESS
+        return jsonify({
+
+            "message":
+            "User created successfully",
+
+            "user":
+            new_user.to_dict()
+
+        }), 201
+
+    except Exception as e:
+
+        print("REGISTER ERROR:", str(e))
+
+        return jsonify({
+
+            "error":
+            "Registration failed",
+
+            "details":
+            str(e)
+
+        }), 500
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
