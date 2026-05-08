@@ -1,7 +1,7 @@
 <template>
     <footer class="footer">
       <div class="footer-content">
-        <p>&copy; {{ year }} Jam Date. Made with love by 🇯🇲</p>
+        <p>&copy; {{ year }} DriftDater. Made with love by 🇯🇲</p>
       </div>
     </footer>
   </template>

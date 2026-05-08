@@ -281,7 +281,7 @@ export default {
           <p>Finding matches...</p>
         </div>
         <div v-else-if="matches.length === 0" class="no-matches">
-          <p>No matches found. Your perfect match might not be on JamDate yet!</p>
+          <p>No matches found. Your perfect match might not be on DriftDater yet!</p>
         </div>
         <div v-else class="matches-list">
           <div v-for="match in matches" :key="match.id" class="match-card">
