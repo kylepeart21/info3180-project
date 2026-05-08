@@ -239,7 +239,7 @@ def get_mutual_matches():
         )
     ).filter(
         f1.user_id_fk == current_user_id           # I am the one who liked first
-    ).subquery()
+    )
 
     mutual_profiles = Profile.query.filter(
         Profile.user_id_fk.in_(mutual_user_ids),
@@ -373,22 +373,10 @@ def get_profile_matches(profile_id):
     if not base_profile:
         return jsonify(error="Profiles not found"), 404
 
-    age_lower_bound = base_profile.birth_year - 5
-    age_upper_bound = base_profile.birth_year + 5
-
     candidates = Profile.query.filter(
         Profile.id != base_profile.id,
         Profile.user_id_fk != base_profile.user_id_fk,
-
-        # OPTIONAL FEATURE — Only show public profiles
         Profile.is_public == True,
-
-        Profile.birth_year.between(age_lower_bound, age_upper_bound),
-
-        func.abs(
-            Profile.height - base_profile.height
-        ).between(3, 10),
-
     ).all()
 
     # OPTIONAL FEATURE — Hide blocked users
@@ -416,13 +404,13 @@ def get_profile_matches(profile_id):
 
         match_count = 0
 
-        if profile.fav_cuisine == base_profile.fav_cuisine:
+        if profile.fav_cuisine and base_profile.fav_cuisine and profile.fav_cuisine == base_profile.fav_cuisine:
             match_count += 1
 
-        if profile.fav_colour == base_profile.fav_colour:
+        if profile.fav_colour and base_profile.fav_colour and profile.fav_colour == base_profile.fav_colour:
             match_count += 1
 
-        if profile.fav_school_subject == base_profile.fav_school_subject:
+        if profile.fav_school_subject and base_profile.fav_school_subject and profile.fav_school_subject == base_profile.fav_school_subject:
             match_count += 1
 
         if profile.political == base_profile.political:
@@ -434,18 +422,27 @@ def get_profile_matches(profile_id):
         if profile.family_oriented == base_profile.family_oriented:
             match_count += 1
 
+        # Age within 10 years is a bonus point
+        if base_profile.birth_year and profile.birth_year:
+            if abs(profile.birth_year - base_profile.birth_year) <= 10:
+                match_count += 1
+
+        # Height within 20 cm is a bonus point
+        if base_profile.height and profile.height:
+            if abs(profile.height - base_profile.height) <= 20:
+                match_count += 1
+
         shared_interests = set(
             interest.name for interest in profile.interests
         ).intersection(
-            set(
-                interest.name for interest in base_profile.interests
-            )
+            set(interest.name for interest in base_profile.interests)
         )
-
         match_count += len(shared_interests)
 
         if match_count >= 3:
-            matched_profiles.append(profile.to_dict())
+            profile_data = profile.to_dict()
+            profile_data['compatibility'] = round((match_count / 8) * 100)
+            matched_profiles.append(profile_data)
 
     return jsonify(profiles=matched_profiles), 200
 
