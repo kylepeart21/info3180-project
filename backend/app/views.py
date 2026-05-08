@@ -252,6 +252,16 @@ def get_profile_matches(profile_id):
         if profile.family_oriented == base_profile.family_oriented:
             match_count += 1
 
+        shared_interests = set(
+            interest.name for interest in profile.interests
+        ).intersection(
+            set(
+                interest.name for interest in base_profile.interests
+            )
+        )
+
+        match_count += len(shared_interests)
+
         if match_count >= 3:
             matched_profiles.append(profile.to_dict())
 
