@@ -226,150 +226,618 @@ async function handleSubmit() {
 </template>
 
 <style scoped>
+
+/* =========================
+   PAGE
+========================= */
+
 .edit-profile {
+
   min-height: 100vh;
-  padding: 80px 1.5rem 3rem;
-  background: #f8f9fa;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  padding:
+    140px 24px 80px;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(139,92,246,0.18),
+      transparent 25%
+    ),
+
+    radial-gradient(
+      circle at bottom right,
+      rgba(236,72,153,0.14),
+      transparent 25%
+    ),
+
+    #050816;
+
+  position: relative;
+
+  overflow: hidden;
 }
+
+/* =========================
+   CONTAINER
+========================= */
 
 .form-container {
-  max-width: 760px;
+
+  max-width: 920px;
+
   margin: 0 auto;
-  background: #fff;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+
+  padding: 42px;
+
+  border-radius: 38px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(12,18,32,0.78),
+      rgba(18,24,42,0.62)
+    );
+
+  backdrop-filter: blur(28px);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 25px 50px rgba(0,0,0,0.42);
 }
+
+/* =========================
+   TITLE
+========================= */
 
 h1 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+
+  font-size: 3rem;
+
+  font-weight: 800;
+
+  letter-spacing: -0.04em;
+
+  color: white;
+
+  margin-bottom: 38px;
+
   text-align: center;
-  color: #333;
 }
+
+/* =========================
+   LOADING
+========================= */
 
 .loading-state {
+
   text-align: center;
-  padding: 2rem;
-  color: #6c757d;
+
+  padding: 40px;
+
+  color:
+    rgba(255,255,255,0.62);
+
+  font-size: 1rem;
 }
+
+/* =========================
+   ALERTS
+========================= */
 
 .alert {
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  border-left: 4px solid;
+
+  padding: 18px 20px;
+
+  border-radius: 20px;
+
+  margin-bottom: 24px;
+
+  font-weight: 600;
+
+  backdrop-filter: blur(16px);
 }
 
-.alert.success { background: #e6ffed; border-color: #28a745; color: #2b7a2b; }
-.alert.error { background: #ffe6e6; border-color: #dc3545; color: #a71d2a; }
+.alert.success {
 
-form { display: flex; flex-direction: column; gap: 1.5rem; }
+  background:
+    rgba(34,197,94,0.16);
+
+  border:
+    1px solid rgba(34,197,94,0.22);
+
+  color: #bbf7d0;
+}
+
+.alert.error {
+
+  background:
+    rgba(239,68,68,0.16);
+
+  border:
+    1px solid rgba(239,68,68,0.22);
+
+  color: #fecaca;
+}
+
+/* =========================
+   FORM
+========================= */
+
+form {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 30px;
+}
+
+/* =========================
+   GRID
+========================= */
 
 .grid {
+
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(240px, 1fr));
+
+  gap: 22px;
 }
 
-.form-group { display: flex; flex-direction: column; gap: 4px; }
-.form-group.full { grid-column: 1 / -1; }
+/* =========================
+   FORM GROUP
+========================= */
+
+.form-group {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.form-group.full {
+
+  grid-column: 1 / -1;
+}
+
+/* =========================
+   LABELS
+========================= */
 
 label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #444;
+
+  color:
+    rgba(255,255,255,0.82);
+
+  font-size: 0.92rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.01em;
 }
 
+/* =========================
+   INPUTS
+========================= */
+
 .input {
-  padding: 10px 12px;
-  font-size: 0.95rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fefefe;
-  transition: border 0.2s;
+
   width: 100%;
+
+  min-height: 58px;
+
+  padding: 0 18px;
+
+  border-radius: 20px;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  background:
+    rgba(255,255,255,0.06);
+
+  color: white;
+
+  font-size: 0.96rem;
+
+  outline: none;
+
+  transition: all 0.3s ease;
+
+  backdrop-filter: blur(18px);
+
   box-sizing: border-box;
 }
 
-.input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.15); }
+.input::placeholder {
 
-textarea.input { min-height: 120px; resize: vertical; }
+  color:
+    rgba(255,255,255,0.42);
+}
 
-.char-count { font-size: 0.8rem; color: #888; text-align: right; }
+/* FOCUS */
 
-.interests-input-row { display: flex; gap: 8px; }
-.interests-input-row .input { flex: 1; }
+.input:focus {
+
+  border-color:
+    rgba(139,92,246,0.5);
+
+  box-shadow:
+    0 0 24px rgba(139,92,246,0.22);
+}
+
+/* =========================
+   TEXTAREA
+========================= */
+
+textarea.input {
+
+  min-height: 160px;
+
+  padding-top: 18px;
+
+  resize: vertical;
+}
+
+/* =========================
+   SELECT
+========================= */
+
+select.input {
+
+  appearance: none;
+}
+
+/* =========================
+   CHARACTER COUNT
+========================= */
+
+.char-count {
+
+  text-align: right;
+
+  font-size: 0.78rem;
+
+  color:
+    rgba(255,255,255,0.42);
+}
+
+/* =========================
+   INTERESTS
+========================= */
+
+.interests-input-row {
+
+  display: flex;
+
+  gap: 12px;
+}
+
+.interests-input-row .input {
+
+  flex: 1;
+}
+
+/* =========================
+   ADD BUTTON
+========================= */
 
 .btn-add {
-  padding: 10px 14px;
-  background: #28a745;
-  color: white;
+
+  min-width: 120px;
+
   border: none;
-  border-radius: 6px;
-  font-weight: 600;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #16a34a
+    );
+
+  color: white;
+
+  font-weight: 700;
+
   cursor: pointer;
-  white-space: nowrap;
+
+  transition: all 0.3s ease;
+
+  box-shadow:
+    0 10px 24px rgba(34,197,94,0.28);
 }
 
-.interests-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.btn-add:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 14px 28px rgba(34,197,94,0.36);
+}
+
+/* =========================
+   TAGS
+========================= */
+
+.interests-tags {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 16px;
+}
 
 .tag {
-  background: #e9ecef;
-  border-radius: 16px;
-  padding: 4px 10px;
-  font-size: 13px;
+
   display: flex;
+
   align-items: center;
-  gap: 6px;
+
+  gap: 8px;
+
+  padding: 10px 16px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+
+  color: white;
+
+  font-size: 0.82rem;
+
+  font-weight: 600;
 }
+
+/* REMOVE */
 
 .tag-remove {
+
   background: none;
+
   border: none;
+
+  color:
+    rgba(255,255,255,0.58);
+
   cursor: pointer;
-  font-size: 16px;
-  color: #888;
-  line-height: 1;
-  padding: 0;
+
+  font-size: 1rem;
+
+  transition: all 0.2s ease;
 }
 
-.checkboxes { display: flex; flex-wrap: wrap; gap: 1rem; }
+.tag-remove:hover {
+
+  color: #f87171;
+}
+
+/* =========================
+   CHECKBOXES
+========================= */
+
+.checkboxes {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 16px;
+}
 
 .checkbox-label {
+
   display: flex;
+
   align-items: center;
-  gap: 8px;
+
+  gap: 12px;
+
+  padding: 18px;
+
+  border-radius: 22px;
+
+  background:
+    rgba(255,255,255,0.05);
+
+  border:
+    1px solid rgba(255,255,255,0.06);
+
+  backdrop-filter: blur(16px);
+
+  color:
+    rgba(255,255,255,0.78);
+
   cursor: pointer;
-  font-size: 0.95rem;
+
+  transition: all 0.3s ease;
 }
 
-.form-actions { display: flex; justify-content: flex-end; gap: 1rem; flex-wrap: wrap; }
+.checkbox-label:hover {
+
+  background:
+    rgba(255,255,255,0.08);
+}
+
+.checkbox-label input {
+
+  width: 18px;
+  height: 18px;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.form-actions {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 16px;
+
+  margin-top: 10px;
+
+  flex-wrap: wrap;
+}
+
+/* =========================
+   PRIMARY BUTTON
+========================= */
 
 .btn-primary {
-  background: #007bff;
-  color: white;
+
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
+
+  padding: 16px 28px;
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #6d28d9
+    );
+
+  color: white;
+
+  font-weight: 700;
+
   cursor: pointer;
-  transition: background 0.2s;
+
+  transition: all 0.3s ease;
+
+  box-shadow:
+    0 12px 28px rgba(139,92,246,0.3);
 }
 
-.btn-primary:hover:not(:disabled) { background: #0056b3; }
+.btn-primary:hover:not(:disabled) {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 16px 34px rgba(139,92,246,0.4);
+}
+
+/* =========================
+   SECONDARY BUTTON
+========================= */
 
 .btn-secondary {
-  background: #e0e0e0;
-  color: #333;
+
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
+
+  padding: 16px 28px;
+
+  border-radius: 22px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  color: white;
+
+  font-weight: 700;
+
   cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  backdrop-filter: blur(16px);
 }
 
-button:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-secondary:hover {
+
+  background:
+    rgba(255,255,255,0.12);
+
+  transform:
+    translateY(-2px);
+}
+
+/* =========================
+   DISABLED
+========================= */
+
+button:disabled {
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .edit-profile {
+
+    padding:
+      120px 16px 60px;
+  }
+
+  .form-container {
+
+    padding: 30px 22px;
+  }
+
+  h1 {
+
+    font-size: 2.2rem;
+  }
+
+  .grid {
+
+    grid-template-columns: 1fr;
+  }
+
+  .interests-input-row {
+
+    flex-direction: column;
+  }
+
+  .btn-add {
+
+    width: 100%;
+
+    min-height: 56px;
+  }
+
+  .form-actions {
+
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+
+    width: 100%;
+  }
+}
 </style>

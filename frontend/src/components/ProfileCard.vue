@@ -199,10 +199,15 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 
+/* =========================
+   PROFILE CARD
+========================= */
+
 .profile-card {
+
+  position: relative;
 
   width: 100%;
 
@@ -212,7 +217,58 @@ export default {
 
   border-radius: 34px;
 
-  transition: all 0.45s ease;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(18,24,42,0.72),
+      rgba(12,18,32,0.58)
+    );
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(24px);
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.38);
+
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease;
+
+  animation:
+    fadeUp 0.6s ease;
+}
+
+/* BORDER GLOW */
+
+.profile-card::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  border-radius: 34px;
+
+  padding: 1px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0.12),
+      rgba(255,255,255,0.02)
+    );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  -webkit-mask-composite: xor;
+   mask-composite: exclude;
+
+  pointer-events: none;
 }
 
 .profile-card:hover {
@@ -220,7 +276,14 @@ export default {
   transform:
     translateY(-10px)
     scale(1.015);
+
+  box-shadow:
+    0 28px 50px rgba(0,0,0,0.45);
 }
+
+/* =========================
+   IMAGE WRAPPER
+========================= */
 
 .profile-image-wrapper {
 
@@ -229,7 +292,13 @@ export default {
   width: 100%;
 
   height: 560px;
+
+  overflow: hidden;
 }
+
+/* =========================
+   IMAGE
+========================= */
 
 .profile-image {
 
@@ -238,16 +307,25 @@ export default {
 
   object-fit: cover;
 
+  filter:
+    brightness(0.92)
+    saturate(1.05)
+    contrast(1.04);
+
   transition:
     transform 0.7s ease;
 }
 
 .profile-card:hover .profile-image {
 
-  transform: scale(1.06);
+  transform:
+    scale(1.08)
+    translateY(-4px);
 }
 
-/* OVERLAY */
+/* =========================
+   OVERLAY
+========================= */
 
 .image-overlay {
 
@@ -258,13 +336,57 @@ export default {
   background:
     linear-gradient(
       to top,
-      rgba(0,0,0,0.92) 0%,
-      rgba(0,0,0,0.18) 45%,
+      rgba(0,0,0,0.96) 0%,
+      rgba(0,0,0,0.22) 45%,
       rgba(0,0,0,0.08) 100%
     );
 }
 
-/* BADGES */
+/* =========================
+   GLASS REFLECTION
+========================= */
+
+.glass-reflection {
+
+  position: absolute;
+
+  top: -30%;
+
+  left: -40%;
+
+  width: 80%;
+
+  height: 160%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 20%,
+      rgba(255,255,255,0.10) 40%,
+      transparent 60%
+    );
+
+  transform:
+    rotate(18deg);
+
+  pointer-events: none;
+
+  opacity: 0.7;
+
+  transition:
+    transform 0.8s ease;
+}
+
+.profile-card:hover .glass-reflection {
+
+  transform:
+    rotate(18deg)
+    translateX(20px);
+}
+
+/* =========================
+   TOP BADGES
+========================= */
 
 .top-badges {
 
@@ -280,6 +402,10 @@ export default {
 
   z-index: 3;
 }
+
+/* =========================
+   GLASS PILL
+========================= */
 
 .glass-pill {
 
@@ -300,15 +426,25 @@ export default {
   font-weight: 700;
 
   color: white;
+
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.2);
 }
+
+/* MUTUAL */
 
 .mutual-pill {
 
   background:
     rgba(34,197,94,0.25);
+
+  border:
+    1px solid rgba(34,197,94,0.25);
 }
 
-/* CONTENT */
+/* =========================
+   PROFILE CONTENT
+========================= */
 
 .profile-content {
 
@@ -323,6 +459,15 @@ export default {
   z-index: 3;
 }
 
+/* =========================
+   PROFILE MAIN
+========================= */
+
+.profile-main {
+
+  margin-bottom: 10px;
+}
+
 .profile-name {
 
   font-size: 2rem;
@@ -332,6 +477,11 @@ export default {
   color: white;
 
   margin-bottom: 4px;
+
+  letter-spacing: -0.03em;
+
+  text-shadow:
+    0 6px 20px rgba(0,0,0,0.45);
 }
 
 .profile-meta {
@@ -340,9 +490,13 @@ export default {
     rgba(255,255,255,0.78);
 
   font-size: 1rem;
+
+  font-weight: 500;
 }
 
-/* INTERESTS */
+/* =========================
+   INTERESTS
+========================= */
 
 .interests-list {
 
@@ -374,9 +528,22 @@ export default {
   font-size: 0.82rem;
 
   font-weight: 600;
+
+  transition: all 0.3s ease;
 }
 
-/* EXPANDED */
+.interest-pill:hover {
+
+  background:
+    rgba(139,92,246,0.22);
+
+  transform:
+    translateY(-1px);
+}
+
+/* =========================
+   EXPANDED SECTION
+========================= */
 
 .expanded-section {
 
@@ -412,6 +579,10 @@ export default {
   font-weight: 600;
 }
 
+/* =========================
+   COMPATIBILITY
+========================= */
+
 .compatibility-box {
 
   margin-top: 18px;
@@ -422,6 +593,11 @@ export default {
 
   background:
     rgba(255,255,255,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.06);
+
+  backdrop-filter: blur(14px);
 
   text-align: center;
 
@@ -435,7 +611,9 @@ export default {
   margin-left: 8px;
 }
 
-/* ACTIONS */
+/* =========================
+   ACTIONS
+========================= */
 
 .card-actions {
 
@@ -447,6 +625,10 @@ export default {
 
   margin-top: 26px;
 }
+
+/* =========================
+   DETAILS BUTTON
+========================= */
 
 .details-btn {
 
@@ -472,7 +654,8 @@ export default {
   transition: all 0.3s ease;
 
   box-shadow:
-    0 8px 22px rgba(139,92,246,0.32);
+    0 14px 30px rgba(139,92,246,0.28),
+    0 0 24px rgba(139,92,246,0.16);
 }
 
 .details-btn:hover {
@@ -481,8 +664,13 @@ export default {
     translateY(-2px);
 
   box-shadow:
-    0 10px 28px rgba(139,92,246,0.42);
+    0 18px 34px rgba(139,92,246,0.38),
+    0 0 28px rgba(139,92,246,0.22);
 }
+
+/* =========================
+   ACTION BUTTONS
+========================= */
 
 .action-buttons {
 
@@ -495,6 +683,10 @@ export default {
   margin-left: 16px;
 }
 
+/* =========================
+   PASS BUTTON
+========================= */
+
 .pass-btn {
 
   width: 52px;
@@ -502,10 +694,11 @@ export default {
 
   border-radius: 50%;
 
-  border: none;
+  border:
+    1px solid rgba(255,255,255,0.10);
 
   background:
-    rgba(255,255,255,0.12);
+    rgba(255,255,255,0.08);
 
   backdrop-filter: blur(12px);
 
@@ -526,6 +719,33 @@ export default {
   transform:
     scale(1.08);
 }
+
+/* =========================
+   ENTRY ANIMATION
+========================= */
+
+@keyframes fadeUp {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(20px);
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 768px) {
 
@@ -554,6 +774,11 @@ export default {
   .action-buttons {
 
     margin-left: 0;
+  }
+
+  .details-btn {
+
+    width: 100%;
   }
 }
 

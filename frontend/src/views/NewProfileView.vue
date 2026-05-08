@@ -269,211 +269,601 @@ const handleSubmit = async () => {
 </template>
 
 <style scoped>
+
+/* =========================
+   PAGE
+========================= */
+
 .create-profile {
-  background-color: #fff;
+
   min-height: 100vh;
-  padding: 3rem 1.5rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+
+  padding:
+    140px 24px 80px;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(139,92,246,0.18),
+      transparent 25%
+    ),
+
+    radial-gradient(
+      circle at bottom right,
+      rgba(236,72,153,0.14),
+      transparent 25%
+    ),
+
+    #050816;
+
+  color: white;
+
+  overflow: hidden;
 }
+
+/* =========================
+   CONTAINER
+========================= */
+
+.max-w-3xl {
+
+  max-width: 920px !important;
+
+  margin: 0 auto;
+
+  padding: 42px !important;
+
+  border-radius: 38px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(12,18,32,0.78),
+      rgba(18,24,42,0.62)
+    );
+
+  backdrop-filter: blur(28px);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 25px 50px rgba(0,0,0,0.42);
+}
+
+/* =========================
+   TITLE
+========================= */
 
 h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
+
+  font-size: 3rem;
+
+  font-weight: 800;
+
+  letter-spacing: -0.04em;
+
   text-align: center;
-}
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
+  margin-bottom: 42px;
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #444;
-}
-
-.input,
-textarea,
-select {
-  padding: 10px 14px;
-  font-size: 0.95rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #fefefe;
-  transition: border 0.2s ease, box-shadow 0.2s ease;
-}
-
-.input:focus,
-textarea:focus,
-select:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
-}
-
-textarea {
-  min-height: 150px;
-  resize: vertical;
-}
-
-.checkbox {
-  width: 16px;
-  height: 16px;
-  accent-color: #007bff;
-}
-
-.text-sm {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.btn-primary {
-  background-color: #007bff;
   color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #e0e0e0;
-  color: #333;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: #c2c2c2;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.interests-row {
-  display: flex;
-  gap: 8px;
-}
-
-.interests-row .input { flex: 1; }
-
-.btn-add {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.interests-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.tag {
-  background: #e9ecef;
-  border-radius: 16px;
-  padding: 4px 10px;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tag-remove {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  color: #888;
-  line-height: 1;
-  padding: 0;
-}
+/* =========================
+   ALERTS
+========================= */
 
 .success,
 .error {
-  border-left: 5px solid;
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 1rem;
+
+  padding: 18px 20px;
+
+  border-radius: 20px;
+
+  margin-bottom: 24px;
+
+  font-weight: 600;
+
+  backdrop-filter: blur(16px);
 }
 
 .success {
-  background-color: #e6ffed;
-  border-color: #28a745;
-  color: #2b7a2b;
+
+  background:
+    rgba(34,197,94,0.16);
+
+  border:
+    1px solid rgba(34,197,94,0.22);
+
+  color: #bbf7d0;
 }
 
 .error {
-  background-color: #ffe6e6;
-  border-color: #dc3545;
-  color: #a71d2a;
+
+  background:
+    rgba(239,68,68,0.16);
+
+  border:
+    1px solid rgba(239,68,68,0.22);
+
+  color: #fecaca;
 }
 
-.flex {
+/* =========================
+   FORM
+========================= */
+
+form {
+
   display: flex;
-}
 
-.items-center {
-  align-items: center;
-}
-
-.space-y-4 {
-  display: flex;
   flex-direction: column;
-  gap: 1rem;
+
+  gap: 30px;
 }
 
-.space-x-4 {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
+/* =========================
+   GRID
+========================= */
 
 .grid {
+
   display: grid;
-  gap: 1.5rem;
+
+  gap: 22px;
 }
 
 .grid-cols-1 {
+
   grid-template-columns: 1fr;
 }
 
 @media (min-width: 768px) {
+
   .grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
+
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+}
+
+/* =========================
+   FORM GROUP
+========================= */
+
+.form-group {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+/* =========================
+   LABELS
+========================= */
+
+.label {
+
+  color:
+    rgba(255,255,255,0.82);
+
+  font-size: 0.92rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.01em;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input,
+textarea,
+select {
+
+  width: 100%;
+
+  min-height: 58px;
+
+  padding: 0 18px;
+
+  border-radius: 20px;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  background:
+    rgba(255,255,255,0.06);
+
+  color: white;
+
+  font-size: 0.96rem;
+
+  outline: none;
+
+  transition: all 0.3s ease;
+
+  backdrop-filter: blur(18px);
+
+  box-sizing: border-box;
+}
+
+/* PLACEHOLDER */
+
+.input::placeholder,
+textarea::placeholder {
+
+  color:
+    rgba(255,255,255,0.42);
+}
+
+/* FOCUS */
+
+.input:focus,
+textarea:focus,
+select:focus {
+
+  border-color:
+    rgba(139,92,246,0.5);
+
+  box-shadow:
+    0 0 24px rgba(139,92,246,0.22);
+}
+
+/* =========================
+   TEXTAREA
+========================= */
+
+textarea {
+
+  min-height: 170px;
+
+  padding-top: 18px;
+
+  resize: vertical;
+}
+
+/* =========================
+   SMALL TEXT
+========================= */
+
+.text-sm {
+
+  text-align: right;
+
+  font-size: 0.78rem;
+
+  color:
+    rgba(255,255,255,0.42);
+}
+
+/* =========================
+   INTERESTS
+========================= */
+
+.interests-row {
+
+  display: flex;
+
+  gap: 12px;
+}
+
+.interests-row .input {
+
+  flex: 1;
+}
+
+/* =========================
+   ADD BUTTON
+========================= */
+
+.btn-add {
+
+  min-width: 120px;
+
+  border: none;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #16a34a
+    );
+
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  box-shadow:
+    0 10px 24px rgba(34,197,94,0.28);
+}
+
+.btn-add:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 14px 28px rgba(34,197,94,0.36);
+}
+
+/* =========================
+   TAGS
+========================= */
+
+.interests-tags {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 16px;
+}
+
+.tag {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 10px 16px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+
+  color: white;
+
+  font-size: 0.82rem;
+
+  font-weight: 600;
+}
+
+/* REMOVE */
+
+.tag-remove {
+
+  background: none;
+
+  border: none;
+
+  color:
+    rgba(255,255,255,0.58);
+
+  cursor: pointer;
+
+  font-size: 1rem;
+
+  transition: all 0.2s ease;
+}
+
+.tag-remove:hover {
+
+  color: #f87171;
+}
+
+/* =========================
+   CHECKBOXES
+========================= */
+
+.space-y-4 {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 16px;
+}
+
+.flex.items-center {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 18px;
+
+  border-radius: 22px;
+
+  background:
+    rgba(255,255,255,0.05);
+
+  border:
+    1px solid rgba(255,255,255,0.06);
+
+  backdrop-filter: blur(16px);
+
+  transition: all 0.3s ease;
+}
+
+.flex.items-center:hover {
+
+  background:
+    rgba(255,255,255,0.08);
+}
+
+/* CHECKBOX */
+
+.checkbox {
+
+  width: 18px;
+  height: 18px;
+
+  accent-color: #8b5cf6;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.space-x-4 {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 16px;
+
+  margin-top: 12px;
+
+  flex-wrap: wrap;
+}
+
+/* =========================
+   PRIMARY BUTTON
+========================= */
+
+.btn-primary {
+
+  border: none;
+
+  padding: 16px 28px;
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #6d28d9
+    );
+
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  box-shadow:
+    0 12px 28px rgba(139,92,246,0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 16px 34px rgba(139,92,246,0.4);
+}
+
+/* =========================
+   SECONDARY BUTTON
+========================= */
+
+.btn-secondary {
+
+  border: none;
+
+  padding: 16px 28px;
+
+  border-radius: 22px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  backdrop-filter: blur(16px);
+}
+
+.btn-secondary:hover {
+
+  background:
+    rgba(255,255,255,0.12);
+
+  transform:
+    translateY(-2px);
+}
+
+/* =========================
+   DISABLED
+========================= */
+
+button:disabled {
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .create-profile {
+
+    padding:
+      120px 16px 60px;
   }
 
   .max-w-3xl {
-    max-width: 768px;
-    margin: 0 auto;
+
+    padding: 30px 22px !important;
+  }
+
+  h1 {
+
+    font-size: 2.2rem;
+  }
+
+  .interests-row {
+
+    flex-direction: column;
+  }
+
+  .btn-add {
+
+    width: 100%;
+
+    min-height: 56px;
+  }
+
+  .space-x-4 {
+
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+
+    width: 100%;
   }
 }
 </style>
