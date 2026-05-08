@@ -15,7 +15,7 @@
         <div class="brand-glow"></div>
 
         <span class="brand-text">
-          JamDate
+         DriftDater
         </span>
 
       </RouterLink>
